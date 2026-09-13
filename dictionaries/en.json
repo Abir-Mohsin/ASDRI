@@ -1,0 +1,26 @@
+{
+  "common": {
+    "login": "Login",
+    "dashboard": "Dashboard",
+    "home": "Home",
+    "about": "About",
+    "faculty": "Faculty & Scholars",
+    "courses": "Programs",
+    "admission": "Admission",
+    "library": "Library",
+    "research": "Research",
+    "alumni": "Alumni",
+    "gallery": "Gallery",
+    "contact": "Contact Us",
+    "donate": "Donate",
+    "language": "Language",
+    "search": "Search..."
+  },
+  "home": {
+    "hero_title": "Welcome to As-Sunnah Dawah & Research Institute",
+    "hero_subtitle": "Authentic Islamic Education, Advanced Research, and Dawah based strictly on the Quran and Sunnah.",
+    "apply_now": "Apply Now",
+    "learn_more": "Learn More"
+  }
+}
+

@@ -1,0 +1,188 @@
+{
+  "entities": {
+    "schedule": {
+      "title": "Schedule",
+      "description": "Class schedules for courses",
+      "type": "object",
+      "properties": {
+        "courseId": { "type": "string" },
+        "title": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "dayOfWeek": { "type": "string" },
+        "time": { "type": "string" },
+        "room": { "type": "string" },
+        "meetingLink": { "type": "string" }
+      },
+      "required": ["courseId", "title", "teacherId", "dayOfWeek", "time", "room"]
+    },
+    "assignment": {
+      "title": "Assignment",
+      "description": "Course assignments posted by teachers",
+      "type": "object",
+      "properties": {
+        "courseId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "maxPoints": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["courseId", "title", "teacherId", "dueDate", "maxPoints"]
+    },
+    "submission": {
+      "title": "Submission",
+      "description": "Student submissions for assignments",
+      "type": "object",
+      "properties": {
+        "assignmentId": { "type": "string" },
+        "courseId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "studentEmail": { "type": "string" },
+        "submissionText": { "type": "string" },
+        "submissionLink": { "type": "string" },
+        "submittedAt": { "type": "string" },
+        "status": { "type": "string" },
+        "grade": { "type": "number" },
+        "feedback": { "type": "string" }
+      },
+      "required": ["assignmentId", "courseId", "studentId", "submissionText", "status"]
+    },
+    "material": {
+      "title": "Material",
+      "description": "Lecture notes, sheets, and materials uploaded by teachers",
+      "type": "object",
+      "properties": {
+        "courseId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "fileUrl": { "type": "string" },
+        "fileType": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["courseId", "title", "teacherId", "fileUrl", "fileType"]
+    },
+    "attendance": {
+      "title": "Attendance",
+      "description": "Daily attendance tracking for courses",
+      "type": "object",
+      "properties": {
+        "courseId": { "type": "string" },
+        "date": { "type": "string" },
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "status": { "type": "string" },
+        "recordedBy": { "type": "string" },
+        "recordedAt": { "type": "string" }
+      },
+      "required": ["courseId", "date", "studentId", "status", "recordedBy"]
+    },
+    "marks": {
+      "title": "Marks",
+      "description": "Student exam/assignment grades and marks",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "courseId": { "type": "string" },
+        "examType": { "type": "string" },
+        "score": { "type": "number" },
+        "maxScore": { "type": "number" },
+        "grade": { "type": "string" },
+        "remarks": { "type": "string" },
+        "recordedBy": { "type": "string" },
+        "recordedAt": { "type": "string" }
+      },
+      "required": ["studentId", "courseId", "examType", "score", "maxScore", "recordedBy"]
+    },
+    "course": {
+      "title": "Course",
+      "description": "Academic course offered by the institute",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "code": { "type": "string" },
+        "instructor": { "type": "string" },
+        "progress": { "type": "number" },
+        "students": { "type": "number" },
+        "nextClass": { "type": "string" },
+        "type": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "code", "instructor"]
+    },
+    "contactMessage": {
+      "title": "ContactMessage",
+      "description": "Contact inquiries sent from the About page or contact form",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "email", "phone", "message"]
+    },
+    "notification": {
+      "title": "Notification",
+      "description": "System and role-based notifications sent by admins, teachers, and finance officers",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderRole": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "targetAudience": { "type": "string" },
+        "targetUserId": { "type": "string" },
+        "type": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "readBy": { "type": "array" }
+      },
+      "required": ["senderId", "senderName", "title", "message", "targetAudience", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/contact_messages/{messageId}": {
+      "schema": "contactMessage",
+      "description": "User inquiries and contact messages"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "notification",
+      "description": "System and user notifications"
+    },
+    "/courses/{courseId}": {
+      "schema": "course",
+      "description": "Academic courses"
+    },
+    "/schedules/{scheduleId}": {
+      "schema": "schedule",
+      "description": "Class schedules"
+    },
+    "/assignments/{assignmentId}": {
+      "schema": "assignment",
+      "description": "Course assignments"
+    },
+    "/submissions/{submissionId}": {
+      "schema": "submission",
+      "description": "Student assignment submissions"
+    },
+    "/materials/{materialId}": {
+      "schema": "material",
+      "description": "Lecture materials and notes"
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "attendance",
+      "description": "Course attendance tracking records"
+    },
+    "/marks/{marksId}": {
+      "schema": "marks",
+      "description": "Course exam or quiz marks"
+    }
+  }
+}

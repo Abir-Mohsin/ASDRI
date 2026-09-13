@@ -1,0 +1,91 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  color-scheme: light;
+}
+
+/* Force high contrast text on select dropdowns and options regardless of OS dark mode settings */
+select {
+  color-scheme: light;
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+input, textarea, select {
+  color-scheme: light;
+  color: #0f172a;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+@keyframes marqueeRtl {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-rtl {
+  display: flex;
+  width: max-content;
+  animation: marqueeRtl 40s linear infinite;
+}
+
+.animate-marquee-rtl-slow {
+  display: flex;
+  width: max-content;
+  animation: marqueeRtl 52s linear infinite;
+}
+
+.animate-marquee-rtl:hover,
+.animate-marquee-rtl-slow:hover {
+  animation-play-state: paused;
+}
+
+@media print {
+  @page {
+    size: auto;
+    margin: 10mm;
+  }
+  
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide everything on page except modal print content */
+  body > div:not([data-print-wrapper]) {
+    visibility: visible;
+  }
+
+  .print\\:hidden, 
+  nav, 
+  header, 
+  aside,
+  button {
+    display: none !important;
+  }
+
+  .voucher-print-container {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: #ffffff !important;
+  }
+}
