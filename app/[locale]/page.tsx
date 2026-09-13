@@ -3,6 +3,7 @@ import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/components/Hero';
 import { DynamicHomeNotice } from '@/components/DynamicHomeNotice';
 import { Features } from '@/components/Features';
+import { HomeServicesBento } from '@/components/HomeServicesBento';
 import { HomeResearchSpotlight } from '@/components/HomeResearchSpotlight';
 import { HomeLibraryShowcase } from '@/components/HomeLibraryShowcase';
 import { HomeFacultySpotlight } from '@/components/HomeFacultySpotlight';
@@ -24,6 +25,7 @@ export default async function Home({
         <Hero dict={dict} locale={locale} />
         <DynamicHomeNotice locale={locale} />
         <Features dict={dict} locale={locale} />
+        <HomeServicesBento locale={locale} />
         <HomeResearchSpotlight locale={locale} />
         <HomeLibraryShowcase locale={locale} />
         <HomeFacultySpotlight locale={locale} />

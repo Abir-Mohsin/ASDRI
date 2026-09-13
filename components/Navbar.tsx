@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, ChevronDown, Globe, User as UserIcon, Check, GraduationCap, Info } from 'lucide-react';
+import { Menu, X, ChevronDown, Globe, Check } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Locale } from '@/lib/dictionary';
 import { useAuthStore } from '@/lib/store/useAuthStore';
@@ -14,6 +14,7 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [mobileAboutExpanded, setMobileAboutExpanded] = useState(false);
+  const [mobileServicesExpanded, setMobileServicesExpanded] = useState(false);
   const desktopLangRef = useRef<HTMLDivElement>(null);
   const mobileLangRef = useRef<HTMLDivElement>(null);
 
@@ -57,9 +58,7 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
     { name: dict.common.about, href: `/${locale}/about` },
     { name: dict.common.courses, href: `/${locale}/courses` },
     { name: dict.common.admission, href: `/${locale}/admission` },
-    { name: dict.common.library, href: `/${locale}/library` },
-    { name: dict.common.gallery || 'গ্যালারি', href: `/${locale}/gallery` },
-    { name: dict.common.alumni || 'এলামনাই', href: `/${locale}/alumni` },
+    { name: dict.common.services || (locale === 'bn' ? 'সেবা ও পোর্টাল' : locale === 'ar' ? 'الخدمات' : 'Services'), href: `/${locale}/services` },
   ];
 
   const languages = [
@@ -96,48 +95,150 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
                       <ChevronDown className="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200 group-hover:rotate-180" />
                     </Link>
 
-                    {/* Floating Dropdown on Hover using CSS group-hover */}
-                    <div className="absolute top-full left-0 rtl:left-auto rtl:right-0 pt-1.5 z-50 w-64 hidden group-hover:block transition-all duration-150">
+                    {/* Floating Dropdown on Hover without icons */}
+                    <div className="absolute top-full left-0 rtl:left-auto rtl:right-0 pt-1.5 z-50 w-60 hidden group-hover:block transition-all duration-150">
                       <div className="bg-white rounded-xl shadow-2xl border border-emerald-900/10 py-1.5 text-slate-800 ring-1 ring-black/5 overflow-hidden">
                         <Link
                           href={`/${locale}/about`}
                           className={clsx(
-                            'flex items-start gap-3 px-3.5 py-2.5 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors border-b border-slate-100',
+                            'block px-4 py-2.5 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors border-b border-slate-100',
                             pathname === `/${locale}/about` && 'bg-emerald-50/90 text-emerald-950 font-bold'
                           )}
                         >
-                          <div className="w-8 h-8 rounded-lg bg-emerald-100 text-[#064e3b] flex items-center justify-center shrink-0 mt-0.5">
-                            <Info className="w-4 h-4" />
+                          <div className="text-xs font-bold text-slate-900 leading-tight">
+                            {locale === 'bn' ? 'আমাদের পরিচিতি ও লক্ষ্য' : locale === 'ar' ? 'عن المعهد وررسالته' : 'About ASDRI & Mission'}
                           </div>
-                          <div>
-                            <div className="text-xs font-bold text-slate-900 leading-tight">
-                              {locale === 'bn' ? 'আমাদের পরিচিতি ও লক্ষ্য' : locale === 'ar' ? 'عن المعهد ورسالته' : 'About ASDRI & Mission'}
-                            </div>
-                            <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                              {locale === 'bn' ? 'ইতিহাস, ভিশন ও মূল স্তম্ভ' : locale === 'ar' ? 'الرسالة، الرؤية والأهداف' : 'History, vision and core pillars'}
-                            </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                            {locale === 'bn' ? 'ইতিহাস, ভিশন ও মূল স্তম্ভ' : locale === 'ar' ? 'الرسالة، الرؤية والأهداف' : 'History, vision and core pillars'}
                           </div>
                         </Link>
 
                         <Link
                           href={`/${locale}/faculty`}
                           className={clsx(
-                            'flex items-start gap-3 px-3.5 py-2.5 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors',
+                            'block px-4 py-2.5 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors',
                             pathname === `/${locale}/faculty` && 'bg-emerald-50/90 text-emerald-950 font-bold'
                           )}
                         >
-                          <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
-                            <GraduationCap className="w-4 h-4 text-amber-700" />
+                          <div className="text-xs font-bold text-slate-900 leading-tight">
+                            {dict.common.faculty || (locale === 'bn' ? 'শিক্ষক ও গবেষক পরিষদ' : locale === 'ar' ? 'هيئة التدريس' : 'Faculty & Scholars Council')}
                           </div>
-                          <div>
-                            <div className="text-xs font-bold text-slate-900 leading-tight">
-                              {dict.common.faculty || (locale === 'bn' ? 'শিক্ষক ও গবেষক পরিষদ' : locale === 'ar' ? 'هيئة التدريس' : 'Faculty & Scholars Council')}
-                            </div>
-                            <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                              {locale === 'bn' ? 'প্রথিতযশা উস্তাদ ও গবেষকবৃন্দ' : locale === 'ar' ? 'نخبة الأساتذة والباحثين' : 'Distinguished faculty directory'}
-                            </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                            {locale === 'bn' ? 'প্রথিতযশা উস্তাদ ও গবেষকবৃন্দ' : locale === 'ar' ? 'نخبة الأساتذة والباحثين' : 'Distinguished faculty directory'}
                           </div>
                         </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              if (link.href === `/${locale}/services`) {
+                const isServicesActive = pathname.startsWith(`/${locale}/fatwa`) || pathname.startsWith(`/${locale}/donate`) || pathname.startsWith(`/${locale}/library`) || pathname.startsWith(`/${locale}/research`) || pathname.startsWith(`/${locale}/gallery`) || pathname.startsWith(`/${locale}/alumni`);
+                return (
+                  <div
+                    key={link.name}
+                    className="relative group py-2"
+                  >
+                    <button
+                      type="button"
+                      className={clsx(
+                        'flex items-center gap-1 px-2.5 lg:px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium whitespace-nowrap transition-colors hover:bg-emerald-800 cursor-pointer',
+                        isServicesActive ? 'bg-emerald-800 text-amber-300 font-semibold' : 'text-emerald-50'
+                      )}
+                    >
+                      <span>{link.name}</span>
+                      <ChevronDown className="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200 group-hover:rotate-180" />
+                    </button>
+
+                    {/* Floating Dropdown on Hover without icons */}
+                    <div className="absolute top-full left-0 rtl:left-auto rtl:right-0 pt-1.5 z-50 w-64 hidden group-hover:block transition-all duration-150">
+                      <div className="bg-white rounded-xl shadow-2xl border border-emerald-900/10 py-1.5 text-slate-800 ring-1 ring-black/5 overflow-hidden">
+                        
+                        <Link
+                          href={`/${locale}/fatwa`}
+                          className={clsx(
+                            'block px-4 py-2.5 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors border-b border-slate-100',
+                            pathname === `/${locale}/fatwa` && 'bg-emerald-50/90 text-emerald-950 font-bold'
+                          )}
+                        >
+                          <div className="text-xs font-bold text-slate-900 leading-tight">
+                            {locale === 'bn' ? 'দারুল ইফতা ও ফাতওয়া' : locale === 'ar' ? 'دار الإفتاء والفتاوى' : 'Darul Ifta & Fatwa Portal'}
+                          </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                            {locale === 'bn' ? 'যাচাইকৃত ফাতওয়া আর্কাইভ ও প্রশ্নোত্তর' : 'Verified rulings & ask question'}
+                          </div>
+                        </Link>
+
+                        <Link
+                          href={`/${locale}/donate`}
+                          className={clsx(
+                            'block px-4 py-2.5 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors border-b border-slate-100',
+                            pathname === `/${locale}/donate` && 'bg-emerald-50/90 text-emerald-950 font-bold'
+                          )}
+                        >
+                          <div className="text-xs font-bold text-slate-900 leading-tight">
+                            {locale === 'bn' ? 'যাকাত ও অনুদান ফান্ড' : locale === 'ar' ? 'صندوق الزكاة والتبرعات' : 'Zakat & Donation Fund'}
+                          </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                            {locale === 'bn' ? 'যাকাত ক্যালকুলেটর ও ডিজিটাল মানি রিসিট' : 'Zakat calculator & digital receipt'}
+                          </div>
+                        </Link>
+
+                        <Link
+                          href={`/${locale}/library`}
+                          className={clsx(
+                            'block px-4 py-2.5 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors border-b border-slate-100',
+                            pathname === `/${locale}/library` && 'bg-emerald-50/90 text-emerald-950 font-bold'
+                          )}
+                        >
+                          <div className="text-xs font-bold text-slate-900 leading-tight">
+                            {dict.common.library || (locale === 'bn' ? 'মাকতাবা ও লাইব্রেরি' : 'Maktaba & Library')}
+                          </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                            {locale === 'bn' ? 'ডিজিটাল কিতাব ও গবেষণার সংগ্রহশালা' : 'Digital manuscript & books catalogue'}
+                          </div>
+                        </Link>
+
+                        <Link
+                          href={`/${locale}/research`}
+                          className={clsx(
+                            'block px-4 py-2.5 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors border-b border-slate-100',
+                            pathname === `/${locale}/research` && 'bg-emerald-50/90 text-emerald-950 font-bold'
+                          )}
+                        >
+                          <div className="text-xs font-bold text-slate-900 leading-tight">
+                            {dict.common.research || (locale === 'bn' ? 'উচ্চতর গবেষণা ও জার্নাল' : 'Research Portal')}
+                          </div>
+                          <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                            {locale === 'bn' ? 'তাহকীককৃত গবেষণাপত্র ও জার্নাল' : 'Scholarly publications'}
+                          </div>
+                        </Link>
+
+                        <Link
+                          href={`/${locale}/gallery`}
+                          className={clsx(
+                            'block px-4 py-2 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors border-b border-slate-100',
+                            pathname === `/${locale}/gallery` && 'bg-emerald-50/90 text-emerald-950 font-bold'
+                          )}
+                        >
+                          <div className="text-xs font-semibold text-slate-700">
+                            {dict.common.gallery || (locale === 'bn' ? 'আলোকচিত্র গ্যালারি' : 'Photo Gallery')}
+                          </div>
+                        </Link>
+
+                        <Link
+                          href={`/${locale}/alumni`}
+                          className={clsx(
+                            'block px-4 py-2 text-left rtl:text-right hover:bg-emerald-50/80 transition-colors',
+                            pathname === `/${locale}/alumni` && 'bg-emerald-50/90 text-emerald-950 font-bold'
+                          )}
+                        >
+                          <div className="text-xs font-semibold text-slate-700">
+                            {dict.common.alumni || (locale === 'bn' ? 'এলামনাই অ্যাসোসিয়েশন' : 'Alumni Network')}
+                          </div>
+                        </Link>
+
                       </div>
                     </div>
                   </div>
@@ -157,7 +258,7 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
                 </Link>
               );
             })}
-            
+
             {/* Language Dropdown Selector */}
             <div className="relative shrink-0" ref={desktopLangRef}>
               <button 
@@ -196,19 +297,26 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
               )}
             </div>
 
+            {/* Profile Avatar First (only avatar picture, no name or dashboard text) */}
             {user ? (
-              <Link
-                href={`/${locale}/dashboard`}
-                className="inline-flex items-center justify-center gap-2 pl-2 pr-3.5 py-1.5 rounded-full text-xs lg:text-sm font-bold text-white bg-emerald-800/90 hover:bg-emerald-800 border border-emerald-700/80 shadow-xs transition-all whitespace-nowrap shrink-0 group"
-              >
-                <UserAvatar user={user} size="xs" showBorder={true} />
-                <span className="max-w-[120px] truncate font-medium text-amber-300">
-                  {user.displayName || user.email?.split('@')[0]}
-                </span>
-                <span className="text-xs text-emerald-200 group-hover:text-white transition-colors">
-                  ({dict.common.dashboard || 'Dashboard'})
-                </span>
-              </Link>
+              <div className="flex items-center gap-2 lg:gap-3 shrink-0">
+                <Link
+                  href={`/${locale}/dashboard`}
+                  title={user.displayName || user.email || 'Dashboard'}
+                  className="inline-flex items-center justify-center p-0.5 rounded-full hover:ring-2 hover:ring-amber-400/80 transition-all shrink-0 focus:outline-none"
+                  aria-label="User Dashboard Profile"
+                >
+                  <UserAvatar user={user} size="sm" showBorder={true} />
+                </Link>
+
+                {/* Donate Button placed after profile avatar */}
+                <Link
+                  href={`/${locale}/donate`}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs lg:text-sm font-extrabold bg-amber-500 hover:bg-amber-400 text-emerald-950 transition-all shadow-sm shrink-0 whitespace-nowrap"
+                >
+                  <span>Donate</span>
+                </Link>
+              </div>
             ) : (
               <div className="flex items-center gap-2 lg:gap-3 shrink-0">
                 <Link
@@ -222,6 +330,14 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
                   className="bg-amber-500 hover:bg-amber-400 text-emerald-950 px-3 lg:px-4 py-1.5 lg:py-2 rounded-lg text-xs lg:text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
                 >
                   {dict?.home?.apply_now || (locale === 'bn' ? 'আবেদন করুন' : locale === 'ar' ? 'قدم الآن' : 'Apply Now')}
+                </Link>
+                
+                {/* Donate Button placed after auth buttons */}
+                <Link
+                  href={`/${locale}/donate`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs lg:text-sm font-extrabold bg-amber-500 hover:bg-amber-400 text-emerald-950 transition-all shadow-sm shrink-0 whitespace-nowrap ml-1"
+                >
+                  <span>Donate</span>
                 </Link>
               </div>
             )}
@@ -301,19 +417,87 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
                       <div className="pl-4 rtl:pl-0 rtl:pr-4 space-y-1 bg-emerald-900/60 rounded-lg p-2">
                         <Link
                           href={`/${locale}/about`}
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-emerald-100 hover:text-white hover:bg-emerald-800/80"
+                          className="block px-3 py-2 rounded-md text-sm text-emerald-100 hover:text-white hover:bg-emerald-800/80"
                           onClick={() => setIsOpen(false)}
                         >
-                          <Info className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                          <span>{locale === 'bn' ? 'আমাদের পরিচিতি ও লক্ষ্য' : locale === 'ar' ? 'عن المعهد ورسالته' : 'About ASDRI & Mission'}</span>
+                          {locale === 'bn' ? 'আমাদের পরিচিতি ও লক্ষ্য' : locale === 'ar' ? 'عن المعهد ورسالته' : 'About ASDRI & Mission'}
                         </Link>
                         <Link
                           href={`/${locale}/faculty`}
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-emerald-100 hover:text-white hover:bg-emerald-800/80"
+                          className="block px-3 py-2 rounded-md text-sm text-emerald-100 hover:text-white hover:bg-emerald-800/80"
                           onClick={() => setIsOpen(false)}
                         >
-                          <GraduationCap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                          <span>{dict.common.faculty || (locale === 'bn' ? 'শিক্ষক ও গবেষক পরিষদ' : locale === 'ar' ? 'هيئة التدريس' : 'Faculty & Scholars')}</span>
+                          {dict.common.faculty || (locale === 'bn' ? 'শিক্ষক ও গবেষক পরিষদ' : locale === 'ar' ? 'هيئة التدريس' : 'Faculty & Scholars')}
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              if (link.href === `/${locale}/services`) {
+                return (
+                  <div key={link.name} className="space-y-1">
+                    <div className="flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-white hover:bg-emerald-700">
+                      <span className="flex-1 cursor-pointer" onClick={() => setMobileServicesExpanded(!mobileServicesExpanded)}>
+                        {link.name}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMobileServicesExpanded(!mobileServicesExpanded);
+                        }}
+                        className="p-1 text-emerald-200 hover:text-white"
+                        aria-label="Toggle Submenu"
+                      >
+                        <ChevronDown className={clsx('w-4 h-4 transition-transform', mobileServicesExpanded && 'rotate-180')} />
+                      </button>
+                    </div>
+
+                    {mobileServicesExpanded && (
+                      <div className="pl-4 rtl:pl-0 rtl:pr-4 space-y-1 bg-emerald-900/60 rounded-lg p-2">
+                        <Link
+                          href={`/${locale}/fatwa`}
+                          className="block px-3 py-1.5 rounded-md text-sm text-emerald-100 hover:text-white hover:bg-emerald-800/80"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {locale === 'bn' ? 'দারুল ইফতা ও ফাতওয়া' : 'Fatwa & Ifta Portal'}
+                        </Link>
+                        <Link
+                          href={`/${locale}/donate`}
+                          className="block px-3 py-1.5 rounded-md text-sm text-amber-300 font-bold hover:text-white hover:bg-emerald-800/80"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {locale === 'bn' ? 'যাকাত ও অনুদান ফান্ড' : 'Zakat & Donation Fund'}
+                        </Link>
+                        <Link
+                          href={`/${locale}/library`}
+                          className="block px-3 py-1.5 rounded-md text-sm text-emerald-100 hover:text-white hover:bg-emerald-800/80"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {dict.common.library || (locale === 'bn' ? 'মাকতাবা ও লাইব্রেরি' : 'Maktaba & Library')}
+                        </Link>
+                        <Link
+                          href={`/${locale}/research`}
+                          className="block px-3 py-1.5 rounded-md text-sm text-emerald-100 hover:text-white hover:bg-emerald-800/80"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {dict.common.research || 'Research Portal'}
+                        </Link>
+                        <Link
+                          href={`/${locale}/gallery`}
+                          className="block px-3 py-1.5 rounded-md text-sm text-emerald-100 hover:text-white hover:bg-emerald-800/80"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {dict.common.gallery || 'Gallery'}
+                        </Link>
+                        <Link
+                          href={`/${locale}/alumni`}
+                          className="block px-3 py-1.5 rounded-md text-sm text-emerald-100 hover:text-white hover:bg-emerald-800/80"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {dict.common.alumni || 'Alumni'}
                         </Link>
                       </div>
                     )}
@@ -332,42 +516,55 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
                 </Link>
               );
             })}
+
             <div className="flex gap-2 px-3 py-2 border-t border-emerald-700/60 pt-3">
                <button type="button" onClick={() => { setIsOpen(false); handleLanguageSelect('en'); }} className={clsx("px-3 py-1.5 rounded text-xs font-bold transition-all", locale === 'en' ? "bg-amber-500 text-emerald-950 font-extrabold" : "bg-emerald-900 text-emerald-100 hover:bg-emerald-700")}>English</button>
                <button type="button" onClick={() => { setIsOpen(false); handleLanguageSelect('bn'); }} className={clsx("px-3 py-1.5 rounded text-xs font-bold transition-all", locale === 'bn' ? "bg-amber-500 text-emerald-950 font-extrabold" : "bg-emerald-900 text-emerald-100 hover:bg-emerald-700")}>বাংলা</button>
                <button type="button" onClick={() => { setIsOpen(false); handleLanguageSelect('ar'); }} className={clsx("px-3 py-1.5 rounded text-xs font-bold transition-all", locale === 'ar' ? "bg-amber-500 text-emerald-950 font-extrabold" : "bg-emerald-900 text-emerald-100 hover:bg-emerald-700")}>العربية</button>
             </div>
+
             {user ? (
-              <Link
-                href={`/${locale}/dashboard`}
-                className="flex items-center gap-3 w-full mt-4 bg-emerald-900/90 border border-emerald-700/60 p-3 rounded-xl text-white hover:bg-emerald-800 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <UserAvatar user={user} size="sm" showBorder={true} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold text-amber-400 truncate">
-                    {user.displayName || user.email}
-                  </div>
-                  <div className="text-xs text-emerald-300 font-medium flex items-center gap-1">
-                    <span>{dict.common.dashboard || 'Dashboard'}</span> →
-                  </div>
-                </div>
-              </Link>
-            ) : (
-              <div className="flex flex-col gap-2 mt-4">
+              <div className="flex items-center justify-between gap-3 w-full mt-4 bg-emerald-900/90 border border-emerald-700/60 p-3 rounded-xl">
                 <Link
-                  href={`/${locale}/login`}
-                  className="block w-full text-center text-emerald-100 hover:text-white px-4 py-2 rounded-md text-base font-medium border border-emerald-700"
+                  href={`/${locale}/dashboard`}
+                  title={user.displayName || user.email || 'Dashboard'}
+                  className="p-1 rounded-full hover:ring-2 hover:ring-amber-400"
                   onClick={() => setIsOpen(false)}
                 >
-                  {dict.common.login}
+                  <UserAvatar user={user} size="md" showBorder={true} />
                 </Link>
                 <Link
-                  href={`/${locale}/register`}
-                  className="block w-full text-center bg-amber-500 hover:bg-amber-600 text-emerald-950 px-4 py-2 rounded-md text-base font-bold"
+                  href={`/${locale}/donate`}
+                  className="px-5 py-2 rounded-lg text-sm font-extrabold bg-amber-500 hover:bg-amber-400 text-emerald-950 shadow-xs whitespace-nowrap"
                   onClick={() => setIsOpen(false)}
                 >
-                  {dict?.home?.apply_now || (locale === 'bn' ? 'আবেদন করুন' : locale === 'ar' ? 'قدم الآن' : 'Apply Now')}
+                  Donate
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 mt-4">
+                <div className="flex gap-2">
+                  <Link
+                    href={`/${locale}/login`}
+                    className="flex-1 text-center text-emerald-100 hover:text-white px-4 py-2 rounded-md text-base font-medium border border-emerald-700"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {dict.common.login}
+                  </Link>
+                  <Link
+                    href={`/${locale}/register`}
+                    className="flex-1 text-center bg-amber-500 hover:bg-amber-600 text-emerald-950 px-4 py-2 rounded-md text-base font-bold"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {dict?.home?.apply_now || (locale === 'bn' ? 'আবেদন করুন' : locale === 'ar' ? 'قدم الآن' : 'Apply Now')}
+                  </Link>
+                </div>
+                <Link
+                  href={`/${locale}/donate`}
+                  className="flex items-center justify-center w-full py-2.5 rounded-lg text-sm font-bold bg-amber-500 hover:bg-amber-400 text-emerald-950 shadow-xs"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Donate
                 </Link>
               </div>
             )}

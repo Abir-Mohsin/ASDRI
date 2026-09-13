@@ -116,6 +116,8 @@ export function Footer({ dict, locale }: { dict: any; locale: Locale }) {
               <li><Link href={`/${locale}/faculty`} className="text-emerald-100/80 hover:text-amber-300 transition-colors inline-block">{currentF.faculty}</Link></li>
               <li><Link href={`/${locale}/courses`} className="text-emerald-100/80 hover:text-amber-300 transition-colors inline-block">{currentF.courses}</Link></li>
               <li><Link href={`/${locale}/admission`} className="text-emerald-100/80 hover:text-amber-300 transition-colors inline-block">{currentF.admission}</Link></li>
+              <li><Link href={`/${locale}/fatwa`} className="text-emerald-100/80 hover:text-amber-300 transition-colors inline-block">{locale === 'bn' ? 'ফাতওয়া ও দারুল ইফতা' : locale === 'ar' ? 'دار الإفتاء والفتاوى' : 'Fatwa Portal'}</Link></li>
+              <li><Link href={`/${locale}/donate`} className="text-amber-300 font-bold hover:text-white transition-colors inline-block">{locale === 'bn' ? 'যাকাত ও অনুদান ফান্ড' : locale === 'ar' ? 'صندوق الزكاة والتبرعات' : 'Zakat & Donation Fund'}</Link></li>
               <li><Link href={`/${locale}/library`} className="text-emerald-100/80 hover:text-amber-300 transition-colors inline-block">{currentF.library}</Link></li>
               <li><Link href={`/${locale}/research`} className="text-emerald-100/80 hover:text-amber-300 transition-colors inline-block">{currentF.research}</Link></li>
               <li><Link href={`/${locale}/gallery`} className="text-emerald-100/80 hover:text-amber-300 transition-colors inline-block">{currentF.gallery}</Link></li>
