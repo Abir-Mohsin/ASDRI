@@ -86,31 +86,15 @@ export function HomeFacultySpotlight({ locale }: HomeFacultySpotlightProps) {
   };
 
   return (
-    <section className="py-16 sm:py-24 bg-slate-50 border-t border-slate-200/80 font-sans" id="home_faculty_spotlight">
+    <section className="py-20 sm:py-28 bg-white border-t border-slate-200/80 font-sans" id="home_faculty_spotlight">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-12 gap-4">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100/80 border border-emerald-300/60 text-[#064e3b] text-xs font-bold mb-3 shadow-2xs">
-              <Users className="w-3.5 h-3.5 text-emerald-700" />
-              <span>{t.badge}</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#064e3b] font-serif tracking-tight">
-              {t.title}
-            </h2>
-            <p className="mt-2 text-sm sm:text-base text-slate-600 leading-relaxed">
-              {t.subtitle}
-            </p>
-          </div>
-
-          <Link
-            href={`/${locale}/faculty`}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-[#064e3b] text-[#064e3b] hover:text-white border border-slate-200 hover:border-[#064e3b] text-xs sm:text-sm font-bold transition-all duration-200 shrink-0 self-start md:self-auto group shadow-2xs"
-          >
-            <span>{t.viewAll}</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
+        {/* Header: Clean, Centered & Prominent */}
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-[#064e3b] font-serif tracking-tight leading-tight">
+            {t.title}
+          </h2>
+          <div className="mt-4 w-16 h-1 bg-amber-500 mx-auto rounded-full" />
         </div>
 
         {/* Faculty Grid */}
@@ -190,6 +174,16 @@ export function HomeFacultySpotlight({ locale }: HomeFacultySpotlightProps) {
           </div>
         )}
 
+        {/* Section Bottom Action */}
+        <div className="mt-12 sm:mt-16 text-center">
+          <Link
+            href={`/${locale}/faculty`}
+            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[#064e3b] hover:bg-emerald-900 text-white text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-lg cursor-pointer"
+          >
+            <span>{t.viewAll}</span>
+            <ArrowRight className="w-4 h-4 rtl:rotate-180" />
+          </Link>
+        </div>
       </div>
     </section>
   );

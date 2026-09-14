@@ -89,31 +89,15 @@ export function Features({ dict, locale }: { dict: any; locale: Locale }) {
   };
 
   return (
-    <section className="py-16 sm:py-24 bg-slate-50 font-sans" id="features_academic_programs">
+    <section className="py-20 sm:py-28 bg-slate-50 font-sans" id="features_academic_programs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-14 gap-4">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100/80 border border-emerald-300/60 text-[#064e3b] text-xs font-bold mb-3 shadow-2xs">
-              <GraduationCap className="w-3.5 h-3.5 text-emerald-700" />
-              <span>{activeDict.badge}</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#064e3b] font-serif tracking-tight">
-              {activeDict.heading}
-            </h2>
-            <p className="mt-2 text-sm sm:text-base text-slate-600 leading-relaxed">
-              {activeDict.subheading}
-            </p>
-          </div>
-
-          <Link
-            href={`/${locale}/courses`}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-[#064e3b] text-[#064e3b] hover:text-white border border-slate-200 hover:border-[#064e3b] text-xs sm:text-sm font-bold transition-all duration-200 shrink-0 self-start md:self-auto group shadow-2xs"
-          >
-            <span>{activeDict.allCoursesBtn}</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform rtl:rotate-180" />
-          </Link>
+        {/* Section Header: Clean, Minimalist, Centered with High-Contrast Typography */}
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-[#064e3b] font-serif tracking-tight leading-tight">
+            {activeDict.heading}
+          </h2>
+          <div className="mt-4 w-16 h-1 bg-amber-500 mx-auto rounded-full" />
         </div>
         
         {/* Course Cards: 3 Columns with Banner on Top and Snap Details on Bottom */}

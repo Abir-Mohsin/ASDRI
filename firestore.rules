@@ -120,7 +120,7 @@ service cloud.firestore {
     // Faculty & Scholars Directory
     match /faculty_profiles/{profileId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write, delete: if isAuthenticated();
     }
 
     // Contact and Inquiry Messages from About / Public Pages

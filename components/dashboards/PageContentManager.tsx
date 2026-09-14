@@ -16,7 +16,7 @@ import {
   Bookmark, BookMarked, AlertCircle, Video,
   Play, Film, SlidersHorizontal, Maximize2,
   GraduationCap, HelpCircle, FileCheck, CheckSquare, ListOrdered,
-  Globe2, UserPlus, Upload, Sliders, Palette, Link2
+  Globe2, UserPlus, Upload, Sliders, Palette, Link2, Award
 } from 'lucide-react';
 import RichTextEditor from '@/components/RichTextEditor';
 import Link from 'next/link';
@@ -31,6 +31,7 @@ import {
   extractGoogleDriveId, 
   compressUploadedImage 
 } from '@/lib/imageUtils';
+import { HeroStatItem } from '@/components/Hero';
 
 export interface CardItem {
   id?: string;
@@ -177,7 +178,7 @@ export interface PageDefinition {
     galleryVideos?: GalleryVideoItem[];
     // Admission specific fields
     sessionBadge?: string;
-    stats?: AdmissionStat[];
+    stats?: AdmissionStat[] | HeroStatItem[];
     processTitle?: string;
     processSubtitle?: string;
     steps?: AdmissionStep[];
@@ -245,6 +246,13 @@ export const pageDefinitions: PageDefinition[] = [
       title: 'As-Sunnah Dawah and Research Institute',
       subtitle: 'Center for Higher Islamic Education & Contemporary Research in the Light of the Quran and Authentic Sunnah',
       bannerImageUrl: 'https://images.unsplash.com/photo-1542816417-0983cbe33577?auto=format&fit=crop&w=1200&q=80',
+      stats: [
+        { id: 'stat-1', value: '15,000+', label: 'Active Students', subtitle: 'Enrolled across all courses', icon: 'GraduationCap' },
+        { id: 'stat-2', value: '45+', label: 'Academic Programs', subtitle: 'Higher Islamic curriculum', icon: 'BookOpen' },
+        { id: 'stat-3', value: '120+', label: 'Renowned Scholars', subtitle: 'Graduate faculty & researchers', icon: 'Users' },
+        { id: 'stat-4', value: '60,000+', label: 'Library Books & Manuscripts', subtitle: 'Central digital repository', icon: 'BookMarked' },
+        { id: 'stat-5', value: '99.4%', label: 'Academic Success Rate', subtitle: 'Graduates leading nationwide', icon: 'Award' }
+      ] as any,
       content: `Administrative Announcement & Notice:
 The admission process for the new academic session at As-Sunnah Dawah and Research Institute has commenced. All interested candidates are requested to apply using the online application form.
 
@@ -770,6 +778,19 @@ export default function PageContentManager() {
     'যোগ্য শিক্ষকমণ্ডলী',
     'আন্তর্জাতিক একাডেমি মান'
   ]);
+  const [homeStats, setHomeStats] = useState<{
+    id?: string;
+    value: string;
+    label: string;
+    subtitle?: string;
+    icon?: string;
+  }[]>([
+    { id: 'stat-1', value: '15,000+', label: 'Active Students', subtitle: 'Enrolled across all courses', icon: 'GraduationCap' },
+    { id: 'stat-2', value: '45+', label: 'Academic Programs', subtitle: 'Higher Islamic curriculum', icon: 'BookOpen' },
+    { id: 'stat-3', value: '120+', label: 'Renowned Scholars', subtitle: 'Graduate faculty & researchers', icon: 'Users' },
+    { id: 'stat-4', value: '60,000+', label: 'Library Books & Manuscripts', subtitle: 'Central digital repository', icon: 'BookMarked' },
+    { id: 'stat-5', value: '99.4%', label: 'Academic Success Rate', subtitle: 'Graduates leading nationwide', icon: 'Award' }
+  ]);
   const [bannerSourceMode, setBannerSourceMode] = useState<'preset' | 'drive' | 'url' | 'upload'>('preset');
   const [uploadingBanner, setUploadingBanner] = useState<boolean>(false);
 
@@ -1159,6 +1180,11 @@ export default function PageContentManager() {
         if (data.highlights && Array.isArray(data.highlights)) {
           setHomeHighlights(data.highlights);
         }
+        if (data.stats && Array.isArray(data.stats) && selectedPageId === 'home') {
+          setHomeStats(data.stats);
+        } else if (selectedPageId === 'home' && def?.defaultTemplate?.stats) {
+          setHomeStats(def.defaultTemplate.stats as any);
+        }
 
         // Mission & Vision
         if (data.mission) {
@@ -1343,6 +1369,10 @@ export default function PageContentManager() {
           setLearnBtnText('');
           setLearnBtnLink('');
 
+          if (def.id === 'home' && def.defaultTemplate.stats) {
+            setHomeStats(def.defaultTemplate.stats as any);
+          }
+
           if (def.defaultTemplate.mission) setMission(def.defaultTemplate.mission);
           if (def.defaultTemplate.vision) setVision(def.defaultTemplate.vision);
           if (def.defaultTemplate.coreValuesTitle) setCoreValuesTitle(def.defaultTemplate.coreValuesTitle);
@@ -1478,6 +1508,7 @@ export default function PageContentManager() {
         payload.learnBtnText = learnBtnText;
         payload.learnBtnLink = learnBtnLink;
         payload.highlights = homeHighlights;
+        payload.stats = homeStats;
       }
 
       if (selectedPageId === 'about') {
@@ -1839,6 +1870,45 @@ export default function PageContentManager() {
     updated[index] = updated[targetIdx];
     updated[targetIdx] = temp;
     setGalleryVideos(updated);
+  };
+
+  // Home Page Statistics Handlers
+  const handleAddHomeStat = () => {
+    setHomeStats([
+      ...homeStats,
+      {
+        id: `stat-${Date.now()}`,
+        value: '100+',
+        label: 'New Statistic Metric',
+        subtitle: 'Brief description in English',
+        icon: 'Award'
+      }
+    ]);
+  };
+
+  const handleUpdateHomeStat = (index: number, field: string, value: string) => {
+    const updated = [...homeStats];
+    updated[index] = { ...updated[index], [field]: value };
+    setHomeStats(updated);
+  };
+
+  const handleRemoveHomeStat = (index: number) => {
+    if (homeStats.length <= 1) {
+      alert('At least one statistics card must remain.');
+      return;
+    }
+    setHomeStats(homeStats.filter((_, i) => i !== index));
+  };
+
+  const handleMoveHomeStat = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === homeStats.length - 1) return;
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    const updated = [...homeStats];
+    const temp = updated[index];
+    updated[index] = updated[targetIdx];
+    updated[targetIdx] = temp;
+    setHomeStats(updated);
   };
 
   // Admission Page Handlers
@@ -2809,6 +2879,148 @@ export default function PageContentManager() {
                   </div>
                 </div>
               </div>
+
+              {/* SECTION 1.5: Home Page Dynamic Statistics Cards Editor */}
+              {selectedPageId === 'home' && (
+                <div className="p-5 sm:p-6 bg-gradient-to-br from-emerald-50/60 to-amber-50/40 rounded-2xl border border-emerald-200/80 shadow-xs space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-200/60 pb-3">
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-[#064e3b] font-serif flex items-center gap-2">
+                        <Award className="w-5 h-5 text-amber-600" />
+                        Hero Section Statistics Cards (পরিসংখ্যান কার্ডসমূহ)
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-slate-600 mt-1 leading-relaxed">
+                        হিরো সেকশনের নিচে প্রদর্শিত পরিসংখ্যান কার্ডগুলো এখান থেকে সম্পাদনা করুন। সংখ্যা ও লেবেল সবসময় ইংরেজিতে দিন। (মোট কার্ড: {homeStats.length}টি)
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddHomeStat}
+                      className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 bg-[#064e3b] hover:bg-emerald-900 text-white rounded-xl text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4 text-amber-400" />
+                      Add Statistics Card
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {homeStats.map((stat, idx) => (
+                      <div
+                        key={stat.id || idx}
+                        className="p-4 bg-white rounded-xl border border-slate-200 shadow-xs hover:border-emerald-500 transition-all space-y-3 relative group"
+                      >
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                          <span className="text-xs font-extrabold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md">
+                            Card #{idx + 1}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleMoveHomeStat(idx, 'up')}
+                              disabled={idx === 0}
+                              className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 cursor-pointer"
+                              title="Move Left/Up"
+                            >
+                              <ArrowUp className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleMoveHomeStat(idx, 'down')}
+                              disabled={idx === homeStats.length - 1}
+                              className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 cursor-pointer"
+                              title="Move Right/Down"
+                            >
+                              <ArrowDown className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveHomeStat(idx)}
+                              className="p-1 text-red-400 hover:text-red-600 cursor-pointer ml-1"
+                              title="Delete Card"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                            Statistic Number / Metric Value (English):
+                          </label>
+                          <input
+                            type="text"
+                            value={stat.value}
+                            onChange={(e) => handleUpdateHomeStat(idx, 'value', e.target.value)}
+                            placeholder="e.g. 15,000+ or 99.4%"
+                            className="w-full text-xs font-extrabold p-2.5 bg-slate-50 border border-slate-200 rounded-lg outline-none text-emerald-950 focus:border-emerald-600 focus:bg-white"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                            Metric Title / Label (English):
+                          </label>
+                          <input
+                            type="text"
+                            value={stat.label}
+                            onChange={(e) => handleUpdateHomeStat(idx, 'label', e.target.value)}
+                            placeholder="e.g. Active Students"
+                            className="w-full text-xs font-bold p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none text-slate-800 focus:border-emerald-600 focus:bg-white"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                            Short Subtitle / Description (English):
+                          </label>
+                          <input
+                            type="text"
+                            value={stat.subtitle || ''}
+                            onChange={(e) => handleUpdateHomeStat(idx, 'subtitle', e.target.value)}
+                            placeholder="e.g. Enrolled across all courses"
+                            className="w-full text-[11px] p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none text-slate-600 focus:border-emerald-600 focus:bg-white"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                            Card Icon:
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-800 shrink-0">
+                              <RenderIcon name={stat.icon || 'Sparkles'} className="w-4 h-4" />
+                            </div>
+                            <select
+                              value={stat.icon || 'Sparkles'}
+                              onChange={(e) => handleUpdateHomeStat(idx, 'icon', e.target.value)}
+                              className="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none text-slate-700 focus:border-emerald-600 focus:bg-white"
+                            >
+                              {availableIcons.map((ic) => (
+                                <option key={ic.id} value={ic.id}>{ic.label} ({ic.id})</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Live Mini Preview Bar of Stats */}
+                  <div className="pt-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-2">
+                      Live Strip Preview (Cards Placement Simulation):
+                    </span>
+                    <div className="p-3 bg-[#064e3b] rounded-xl flex flex-wrap justify-center gap-2">
+                      {homeStats.map((s, i) => (
+                        <div key={i} className="bg-amber-50/95 border border-amber-200 rounded-lg p-2.5 text-center min-w-[110px] flex-1 max-w-[160px] shadow-2xs">
+                          <div className="text-sm font-extrabold text-[#064e3b]">{s.value || '0'}</div>
+                          <div className="text-[10px] font-bold text-slate-900 truncate">{s.label || 'Metric'}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* SECTION 2: Dynamic Content & Features for Courses Page */}
               {selectedPageId === 'courses' && (

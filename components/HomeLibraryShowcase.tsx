@@ -90,7 +90,7 @@ export function HomeLibraryShowcase({ locale }: HomeLibraryShowcaseProps) {
   };
 
   return (
-    <section className="py-16 sm:py-24 bg-gradient-to-b from-slate-900 via-[#064e3b] to-slate-900 text-white font-sans relative overflow-hidden" id="home_library_showcase">
+    <section className="py-20 sm:py-28 bg-gradient-to-b from-slate-900 via-[#064e3b] to-slate-900 text-white font-sans relative overflow-hidden" id="home_library_showcase">
       {/* Subtle geometric pattern overlay */}
       <div 
         className="absolute inset-0 opacity-10 pointer-events-none"
@@ -101,23 +101,15 @@ export function HomeLibraryShowcase({ locale }: HomeLibraryShowcaseProps) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Header Section */}
-        <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 text-xs font-bold mb-3 shadow-2xs">
-            <Book className="w-3.5 h-3.5 text-amber-300" />
-            <span>{t.badge}</span>
-          </div>
-
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-serif tracking-tight">
+        {/* Header Section: Clean, Centered & Prominent */}
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-white font-serif tracking-tight leading-tight">
             {t.title}
           </h2>
-
-          <p className="mt-3 text-sm sm:text-base text-emerald-100/90 leading-relaxed">
-            {t.subtitle}
-          </p>
+          <div className="mt-4 w-16 h-1 bg-amber-400 mx-auto rounded-full" />
 
           {/* Quick Search Bar */}
-          <form onSubmit={handleSearchSubmit} className="mt-6 max-w-xl mx-auto flex items-center bg-white/10 backdrop-blur-md p-1.5 rounded-2xl border border-white/20 shadow-lg">
+          <form onSubmit={handleSearchSubmit} className="mt-8 max-w-xl mx-auto flex items-center bg-white/10 backdrop-blur-md p-1.5 rounded-2xl border border-white/20 shadow-lg">
             <div className="pl-3 text-emerald-300">
               <Search className="w-4 h-4" />
             </div>

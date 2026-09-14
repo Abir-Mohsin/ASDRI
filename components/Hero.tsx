@@ -7,6 +7,15 @@ import { ArrowRight, BookOpen, Sparkles, CheckCircle2 } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { getOptimizedImageUrl } from '@/lib/imageUtils';
+import { RenderIcon } from '@/lib/iconMap';
+
+export interface HeroStatItem {
+  id?: string;
+  value: string;
+  label: string;
+  subtitle?: string;
+  icon?: string;
+}
 
 interface HeroData {
   title?: string;
@@ -41,6 +50,7 @@ interface HeroData {
   highlightsEn?: string[];
   highlightsBn?: string[];
   highlightsAr?: string[];
+  stats?: HeroStatItem[];
 }
 
 export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
@@ -245,7 +255,7 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
           </div>
 
           {/* Quick Institutional Highlights Row */}
-          <div className="pt-8 sm:pt-12 border-t border-emerald-700/50 max-w-3xl mx-auto">
+          <div className="pt-8 sm:pt-10 border-t border-emerald-700/50 max-w-3xl mx-auto">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
               {highlights.map((item, idx) => (
                 <div
@@ -259,6 +269,49 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
             </div>
           </div>
         </div>
+
+        {/* Dynamic English Key Statistics Cards (Placed cleanly below Hero content) */}
+        {(() => {
+          const defaultStats: HeroStatItem[] = [
+            { id: 'stat-1', value: '15,000+', label: 'Active Students', subtitle: 'Enrolled across all courses', icon: 'GraduationCap' },
+            { id: 'stat-2', value: '45+', label: 'Academic Programs', subtitle: 'Higher Islamic curriculum', icon: 'BookOpen' },
+            { id: 'stat-3', value: '120+', label: 'Renowned Scholars', subtitle: 'Graduate faculty & researchers', icon: 'Users' },
+            { id: 'stat-4', value: '60,000+', label: 'Library Books & Manuscripts', subtitle: 'Central digital repository', icon: 'BookMarked' },
+            { id: 'stat-5', value: '99.4%', label: 'Academic Success Rate', subtitle: 'Graduates leading nationwide', icon: 'Award' }
+          ];
+
+          const statsList: HeroStatItem[] = (data?.stats && data.stats.length > 0) ? data.stats : defaultStats;
+
+          return (
+            <div className="mt-12 sm:mt-16 pt-8 border-t border-emerald-700/40 w-full">
+              <div className="flex flex-wrap justify-center items-stretch gap-3 sm:gap-4 lg:gap-5">
+                {statsList.map((stat, idx) => (
+                  <div
+                    key={stat.id || idx}
+                    className="flex-1 min-w-[140px] max-w-[240px] sm:min-w-[170px] bg-amber-50/95 hover:bg-white border-2 border-amber-200/80 hover:border-amber-400 rounded-2xl p-4 sm:p-5 text-center shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-md flex flex-col justify-between items-center group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100/90 border border-emerald-300/80 flex items-center justify-center text-[#064e3b] group-hover:scale-110 transition-transform mb-3 shrink-0 shadow-2xs">
+                      <RenderIcon name={stat.icon || 'Sparkles'} className="w-5 h-5 text-[#064e3b]" />
+                    </div>
+                    <div>
+                      <div className="text-2xl sm:text-3xl font-extrabold text-[#064e3b] tracking-tight font-sans">
+                        {stat.value}
+                      </div>
+                      <div className="text-xs sm:text-sm font-bold text-slate-900 mt-1 leading-snug font-serif">
+                        {stat.label}
+                      </div>
+                    </div>
+                    {stat.subtitle && (
+                      <div className="text-[10px] sm:text-[11px] text-slate-600 mt-2 line-clamp-2 leading-tight font-medium">
+                        {stat.subtitle}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { 
   collection, getDocs, doc, setDoc, deleteDoc, 
-  serverTimestamp, query, orderBy 
+  serverTimestamp, query, orderBy, onSnapshot 
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { FacultyMember, INITIAL_FACULTY_MEMBERS } from '@/components/FacultyPageContent';
@@ -28,6 +28,9 @@ export function FacultyManager({ locale = 'bn' }: { locale?: string }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const [deletingMember, setDeletingMember] = useState<{ id: string; name: string } | null>(null);
+  const [isDeletingLoading, setIsDeletingLoading] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState<{
@@ -85,7 +88,35 @@ export function FacultyManager({ locale = 'bn' }: { locale?: string }) {
     }
   }, [actionParam]);
 
-  // Fetch faculty from Firestore
+  // Fetch faculty from Firestore in real-time
+  useEffect(() => {
+    setLoading(true);
+    try {
+      const q = query(collection(db, 'faculty_profiles'), orderBy('order', 'asc'));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (!snapshot.empty) {
+          const list: FacultyMember[] = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          } as FacultyMember));
+          setFaculty(list);
+        } else {
+          setFaculty([]);
+        }
+        setLoading(false);
+      }, (error) => {
+        console.error('Error in faculty realtime subscription:', error);
+        setLoading(false);
+      });
+
+      return () => unsubscribe();
+    } catch (error) {
+      console.error('Error setting up faculty listener:', error);
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch function for manual refresh if needed
   const fetchFaculty = async () => {
     setLoading(true);
     try {
@@ -108,10 +139,6 @@ export function FacultyManager({ locale = 'bn' }: { locale?: string }) {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchFaculty();
-  }, []);
 
   // Initialize/Seed default faculty to Firestore
   const handleSeedDefaults = async () => {
@@ -193,16 +220,24 @@ export function FacultyManager({ locale = 'bn' }: { locale?: string }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`আপনি কি নিশ্চিত যে "${name}"-এর প্রোফাইল মুছে ফেলতে চান?`)) return;
+  const handleDelete = (id: string, name: string) => {
+    setDeletingMember({ id, name });
+  };
+
+  const confirmDeleteAction = async () => {
+    if (!deletingMember) return;
+    setIsDeletingLoading(true);
 
     try {
-      await deleteDoc(doc(db, 'faculty_profiles', id));
-      setFeedback({ type: 'success', message: `"${name}" সফলভাবে মুছে ফেলা হয়েছে।` });
-      setFaculty(prev => prev.filter(f => f.id !== id));
+      await deleteDoc(doc(db, 'faculty_profiles', deletingMember.id));
+      setFeedback({ type: 'success', message: `"${deletingMember.name}" সফলভাবে মুছে ফেলা হয়েছে।` });
+      setFaculty(prev => prev.filter(f => f.id !== deletingMember.id));
+      setDeletingMember(null);
     } catch (error: any) {
       console.error('Error deleting faculty:', error);
-      setFeedback({ type: 'error', message: `মুছে ফেলা সম্ভব হয়নি: ${error.message}` });
+      setFeedback({ type: 'error', message: `মুছে ফেলা সম্ভব হয়নি: ${error.message || 'অনাকাঙ্ক্ষিত ত্রুটি'}` });
+    } finally {
+      setIsDeletingLoading(false);
     }
   };
 
@@ -965,6 +1000,55 @@ export function FacultyManager({ locale = 'bn' }: { locale?: string }) {
         </div>
 
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deletingMember && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+            <div className="w-14 h-14 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center mx-auto text-rose-600 shadow-2xs">
+              <Trash2 className="w-7 h-7" />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 font-serif">
+                শিক্ষক প্রোফাইল মুছে ফেলার নিশ্চয়তা
+              </h3>
+              <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                আপনি কি নিশ্চিত যে <span className="font-bold text-rose-700">"{deletingMember.name}"</span>-এর শিক্ষক প্রোফাইল ডাটাবেজ থেকে সম্পূর্ণ মুছে ফেলতে চান?
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <button
+                type="button"
+                disabled={isDeletingLoading}
+                onClick={() => setDeletingMember(null)}
+                className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all disabled:opacity-50"
+              >
+                বাতিল করুন
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingLoading}
+                onClick={confirmDeleteAction}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isDeletingLoading ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    মুছে ফেলা হচ্ছে...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    হ্যাঁ, মুছে ফেলুন
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

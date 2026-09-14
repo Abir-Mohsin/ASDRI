@@ -57,7 +57,7 @@ export function HomeAdmissionCta({ locale }: HomeAdmissionCtaProps) {
   const t = dict[locale] || dict.en;
 
   return (
-    <section className="py-16 sm:py-20 bg-white border-t border-slate-200/80 font-sans" id="home_admission_cta">
+    <section className="py-20 sm:py-28 bg-slate-50 border-t border-slate-200/80 font-sans" id="home_admission_cta">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-gradient-to-br from-[#064e3b] via-[#064e3b] to-emerald-950 text-white rounded-3xl p-8 sm:p-12 lg:p-16 relative overflow-hidden shadow-lg border border-emerald-800/60">
           
@@ -70,11 +70,6 @@ export function HomeAdmissionCta({ locale }: HomeAdmissionCtaProps) {
           />
 
           <div className="relative z-10 max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 text-xs font-bold mb-4 shadow-2xs">
-              <GraduationCap className="w-3.5 h-3.5 text-amber-300" />
-              <span>{t.badge}</span>
-            </div>
-
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-serif tracking-tight leading-tight">
               {t.title}
             </h2>

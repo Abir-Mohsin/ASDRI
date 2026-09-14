@@ -12,27 +12,15 @@ export function HomeServicesBento({ locale }: { locale: Locale }) {
   const isAr = locale === 'ar';
 
   return (
-    <section className="py-16 sm:py-20 bg-slate-100 border-t border-b border-slate-200/90 font-sans" id="home_services_portals">
+    <section className="py-20 sm:py-28 bg-white border-t border-slate-200/90 font-sans" id="home_services_portals">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/90 border border-emerald-300/80 text-emerald-900 text-xs font-bold mb-3 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>
-              {isBn ? 'ইনস্টিটিউটের বিশেষায়িত দ্বীনি সেবা ও পোর্টাল' : isAr ? 'الخدمات الشرعية والمنصات التخصصية' : 'Specialized Institutional Services & Portals'}
-            </span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#064e3b] font-serif tracking-tight">
-            {isBn ? 'দারুল ইফতা ও যাকাত-অনুদান প্ল্যাটফর্ম' : isAr ? 'دار الإفتاء وبوابة الزكاة والتبرعات' : 'Darul Ifta & Zakat-Donation Portals'}
+        {/* Section Header: Clean, Minimalist & Centered */}
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-[#064e3b] font-serif tracking-tight leading-tight">
+            {isBn ? 'দারুল ইফতা ও যাকাত-অনুদান পোর্টাল' : isAr ? 'دار الإفتاء وبوابة الزكاة والتبرعات' : 'Darul Ifta & Zakat-Donation Portals'}
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-slate-700 leading-relaxed font-normal">
-            {isBn 
-              ? 'উম্মাহর জন্য বিশুদ্ধ ইসলামী জ্ঞান, যাচাইকৃত ফাতওয়া এবং নির্ভরযোগ্য আর্থিক স্বচ্ছতায় যাকাত ও সাদাকাহ প্রদানের আধুনিক সমন্বিত ব্যবস্থা।'
-              : isAr
-              ? 'منظومة إلكترونية متكاملة للإفتاء الشرعي المعتمد وحساب وإخراج أموال الزكاة والصدقات.'
-              : 'Empowering the community with verified Islamic legal rulings and a transparent digital platform for fulfilling Zakat and Sadaqah.'}
-          </p>
+          <div className="mt-4 w-16 h-1 bg-amber-500 mx-auto rounded-full" />
         </div>
 
         {/* 2 Big Bento Cards */}
