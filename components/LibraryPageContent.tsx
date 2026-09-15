@@ -14,6 +14,8 @@ import {
 import { formatContentHtml } from '@/lib/contentFormatter';
 import { LibraryBook, DEFAULT_LIBRARY_BOOKS, getBookEmbedUrl, getBookDownloadUrl } from '@/lib/libraryBooksData';
 import { BookReaderModal } from '@/components/BookReaderModal';
+import { searchBooksIndexed, loadAndIndexGoogleSheet } from '@/lib/searchIndex';
+import { parseGoogleSheetBooks } from '@/lib/googleSheetParser';
 
 export interface LibraryPageData {
   title?: string;
@@ -196,7 +198,7 @@ export function LibraryPageContent({ locale }: LibraryPageContentProps) {
     return () => unsubscribe();
   }, []);
 
-  // Fetch / Sync books from Google Sheet URL
+  // Fetch / Sync books from Google Sheet URL using progressive indexing
   const fetchSheetBooks = useCallback(async (sheetUrl: string) => {
     if (!sheetUrl) return;
     setSyncingSheet(true);
@@ -219,6 +221,22 @@ export function LibraryPageContent({ locale }: LibraryPageContentProps) {
         }
       }
 
+      // 1. Direct browser fetch via Google Sheet parser (works fully statically on Firebase hosting)
+      const parsedDirect = await parseGoogleSheetBooks(sheetUrl);
+      if (parsedDirect.success && parsedDirect.books.length > 0) {
+        setSheetBooks(parsedDirect.books);
+        if (typeof window !== 'undefined') {
+          try {
+            sessionStorage.setItem(cacheKey, JSON.stringify(parsedDirect.books));
+          } catch {
+            // cache quota exceeded, ignore
+          }
+        }
+        setSyncingSheet(false);
+        return;
+      }
+
+      // 2. Fallback to API route if available
       const res = await fetch('/api/library/sheet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -266,71 +284,26 @@ export function LibraryPageContent({ locale }: LibraryPageContentProps) {
     return DEFAULT_LIBRARY_BOOKS;
   }, [sheetBooks, data?.syncedBooks]);
 
-  // Unique Categories extracted from books
+  // Search, filter, and pagination executed via indexed engine
+  const searchResult = useMemo(() => {
+    return searchBooksIndexed(allBooks, {
+      query: searchQuery,
+      category: selectedCategory,
+      language: selectedLanguage,
+      page: currentPage,
+      pageSize: itemsPerPage,
+      sortBy: sortBy,
+    });
+  }, [allBooks, searchQuery, selectedCategory, selectedLanguage, currentPage, itemsPerPage, sortBy]);
+
   const dynamicCategories = useMemo(() => {
-    const cats = new Set<string>();
-    allBooks.forEach(b => {
-      if (b.category && b.category.trim()) {
-        cats.add(b.category.trim());
-      }
-    });
-    return Array.from(cats);
-  }, [allBooks]);
+    return searchResult.categories.map(c => c.name);
+  }, [searchResult.categories]);
 
-  // Filtered & Sorted Books
-  const filteredBooks = useMemo(() => {
-    return allBooks.filter(book => {
-      // Category filter
-      if (selectedCategory !== 'all' && book.category !== selectedCategory) {
-        return false;
-      }
-
-      // Language filter
-      if (selectedLanguage !== 'all' && (!book.language || !book.language.includes(selectedLanguage))) {
-        return false;
-      }
-
-      // Search Query
-      if (searchQuery.trim() !== '') {
-        const q = searchQuery.toLowerCase().trim();
-        const matchesTitle = book.title?.toLowerCase().includes(q);
-        const matchesAuthor = book.author?.toLowerCase().includes(q);
-        const matchesCat = book.category?.toLowerCase().includes(q);
-        const matchesLang = book.language?.toLowerCase().includes(q);
-        const matchesVol = book.volume?.toLowerCase().includes(q);
-        const matchesDesc = book.description?.toLowerCase().includes(q);
-
-        if (!matchesTitle && !matchesAuthor && !matchesCat && !matchesLang && !matchesVol && !matchesDesc) {
-          return false;
-        }
-      }
-
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'title') {
-        return (a.title || '').localeCompare(b.title || '', 'bn');
-      }
-      if (sortBy === 'author') {
-        return (a.author || '').localeCompare(b.author || '', 'bn');
-      }
-      if (sortBy === 'category') {
-        return (a.category || '').localeCompare(b.category || '', 'bn');
-      }
-      return 0;
-    });
-  }, [allBooks, selectedCategory, selectedLanguage, searchQuery, sortBy]);
-
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCategory, selectedLanguage, sortBy]);
-
-  // Pagination calculation
-  const totalPages = Math.ceil(filteredBooks.length / itemsPerPage) || 1;
-  const paginatedBooks = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredBooks.slice(start, start + itemsPerPage);
-  }, [filteredBooks, currentPage, itemsPerPage]);
+  const filteredBooks = searchResult.books;
+  const totalMatches = searchResult.totalMatches;
+  const totalPages = searchResult.totalPages;
+  const paginatedBooks = filteredBooks;
 
   const formattedNoticeHtml = data?.content ? formatContentHtml(data.content) : '';
 
@@ -572,7 +545,7 @@ export function LibraryPageContent({ locale }: LibraryPageContentProps) {
             {/* Results summary bar */}
             <div className="flex items-center justify-between text-[11px] text-slate-500 pt-3 border-t border-slate-100">
               <div>
-                {t.showingBooks} <strong className="text-emerald-800">{filteredBooks.length}</strong> {t.booksUnit}
+                {t.showingBooks} <strong className="text-emerald-800">{totalMatches.toLocaleString()}</strong> {t.booksUnit}
                 {selectedCategory !== 'all' && (
                   <span> &bull; {t.categoryLabel} <strong className="text-slate-700">{selectedCategory}</strong></span>
                 )}

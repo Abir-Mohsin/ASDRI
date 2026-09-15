@@ -47,7 +47,7 @@ service cloud.firestore {
     
     match /courses/{courseId} {
       allow read: if true;
-      allow write: if isAuthenticated();
+      allow write: if isTeacher() || isAdmin();
     }
 
     match /enrollments/{enrollmentId} {
@@ -92,7 +92,8 @@ service cloud.firestore {
     }
 
     match /library_books/{bookId} {
-      allow read, write: if isAuthenticated();
+      allow read: if true;
+      allow write: if isLibraryStaff();
     }
 
     match /book_loans/{loanId} {
