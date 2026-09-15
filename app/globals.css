@@ -1,9 +1,167 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@theme {
+  --font-sans: var(--font-plus-jakarta-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: var(--font-noto-serif-bengali), var(--font-amiri), Georgia, serif;
+  --font-english: var(--font-plus-jakarta-sans), system-ui, -apple-system, sans-serif;
+  --font-bengali: var(--font-noto-serif-bengali), serif;
+  --font-arabic-heading: var(--font-noto-kufi-arabic), sans-serif;
+  --font-arabic-ui: var(--font-amiri), serif;
+}
+
 :root {
   color-scheme: light;
+  font-family: var(--font-plus-jakarta-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
+
+/* -------------------------------------------------------------
+   Language-specific Typography Rules
+   English: Plus Jakarta Sans
+   Bengali: Noto Serif Bengali
+   Arabic Headings: Noto Kufi Arabic
+   Arabic UI / Body: Amiri
+---------------------------------------------------------------- */
+
+/* English Locale (Plus Jakarta Sans) */
+[lang="en"],
+.locale-en,
+.font-english {
+  font-family: var(--font-plus-jakarta-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Bengali Locale (Noto Serif Bengali for EVERYTHING in Bengali) */
+[lang="bn"],
+[lang="bn"] body,
+.locale-bn,
+.locale-bn body,
+.font-bengali {
+  font-family: var(--font-noto-serif-bengali), serif;
+}
+
+/* Ensure all typography elements & Tailwind font utility overrides in Bengali use Noto Serif Bengali */
+.locale-bn *,
+[lang="bn"] *,
+.locale-bn p,
+.locale-bn span,
+.locale-bn div,
+.locale-bn a,
+.locale-bn button,
+.locale-bn input,
+.locale-bn select,
+.locale-bn textarea,
+.locale-bn label,
+.locale-bn li,
+.locale-bn td,
+.locale-bn th,
+.locale-bn h1,
+.locale-bn h2,
+.locale-bn h3,
+.locale-bn h4,
+.locale-bn h5,
+.locale-bn h6,
+.locale-bn .font-sans,
+.locale-bn .font-serif,
+[lang="bn"] p,
+[lang="bn"] span,
+[lang="bn"] div,
+[lang="bn"] a,
+[lang="bn"] button,
+[lang="bn"] input,
+[lang="bn"] select,
+[lang="bn"] textarea,
+[lang="bn"] label,
+[lang="bn"] li,
+[lang="bn"] td,
+[lang="bn"] th,
+[lang="bn"] h1,
+[lang="bn"] h2,
+[lang="bn"] h3,
+[lang="bn"] h4,
+[lang="bn"] h5,
+[lang="bn"] h6,
+[lang="bn"] .font-sans,
+[lang="bn"] .font-serif {
+  font-family: var(--font-noto-serif-bengali), var(--font-plus-jakarta-sans), serif;
+}
+
+/* Arabic Locale (Amiri for UI/Body & Noto Kufi Arabic for Headings) */
+[lang="ar"],
+[lang="ar"] body,
+.locale-ar,
+.locale-ar body,
+.font-arabic,
+[dir="rtl"] {
+  font-family: var(--font-amiri), serif;
+}
+
+/* Arabic UI & Body Text Elements (Amiri) */
+[lang="ar"] p,
+[lang="ar"] span,
+[lang="ar"] div,
+[lang="ar"] button,
+[lang="ar"] a,
+[lang="ar"] input,
+[lang="ar"] select,
+[lang="ar"] textarea,
+[lang="ar"] label,
+[lang="ar"] li,
+[lang="ar"] td,
+[lang="ar"] th,
+[lang="ar"] .font-sans,
+.locale-ar p,
+.locale-ar span,
+.locale-ar div,
+.locale-ar button,
+.locale-ar a,
+.locale-ar input,
+.locale-ar select,
+.locale-ar textarea,
+.locale-ar label,
+.locale-ar li,
+.locale-ar td,
+.locale-ar th,
+.locale-ar .font-sans,
+[dir="rtl"] p,
+[dir="rtl"] span,
+[dir="rtl"] button,
+[dir="rtl"] a,
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea,
+[dir="rtl"] label,
+[dir="rtl"] li,
+.font-arabic-ui {
+  font-family: var(--font-amiri), serif;
+}
+
+/* Arabic Headings (Noto Kufi Arabic) */
+[lang="ar"] h1,
+[lang="ar"] h2,
+[lang="ar"] h3,
+[lang="ar"] h4,
+[lang="ar"] h5,
+[lang="ar"] h6,
+.locale-ar h1,
+.locale-ar h2,
+.locale-ar h3,
+.locale-ar h4,
+.locale-ar h5,
+.locale-ar h6,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4,
+[dir="rtl"] h5,
+[dir="rtl"] h6,
+.locale-ar .font-serif,
+.locale-ar .font-heading,
+[dir="rtl"] .font-serif,
+[dir="rtl"] .font-heading,
+.font-arabic-heading {
+  font-family: var(--font-noto-kufi-arabic), sans-serif !important;
+}
+
 
 /* Force high contrast text on select dropdowns and options regardless of OS dark mode settings */
 select {

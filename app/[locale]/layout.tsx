@@ -20,8 +20,19 @@ export default async function LocaleLayout({
   const { locale } = await params;
   const direction = locale === 'ar' ? 'rtl' : 'ltr';
 
+  const localeFontClass =
+    locale === 'bn'
+      ? 'font-bengali locale-bn'
+      : locale === 'ar'
+      ? 'font-arabic locale-ar'
+      : 'font-english locale-en';
+
   return (
-    <div dir={direction} className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50">
+    <div
+      lang={locale}
+      dir={direction}
+      className={`min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-50 ${localeFontClass}`}
+    >
       <AuthProvider>{children}</AuthProvider>
     </div>
   );
