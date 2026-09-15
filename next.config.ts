@@ -1,7 +1,8 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['firebase', '@grpc/grpc-js'],
+  output: 'export',
+  devIndicators: false,
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
@@ -10,6 +11,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

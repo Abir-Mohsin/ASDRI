@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { fetchAllCourses } from '@/lib/coursesData';
 
+export const dynamic = 'force-static';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.APP_URL || 'https://asdri.edu.bd';
   const locales = ['en', 'bn', 'ar'];

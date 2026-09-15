@@ -221,7 +221,7 @@ export function LibraryPageContent({ locale }: LibraryPageContentProps) {
         }
       }
 
-      // 1. Direct browser fetch via Google Sheet parser (works fully statically on Firebase hosting)
+      // Direct browser fetch via Google Sheet parser (works fully statically on Firebase hosting)
       const parsedDirect = await parseGoogleSheetBooks(sheetUrl);
       if (parsedDirect.success && parsedDirect.books.length > 0) {
         setSheetBooks(parsedDirect.books);
@@ -232,31 +232,8 @@ export function LibraryPageContent({ locale }: LibraryPageContentProps) {
             // cache quota exceeded, ignore
           }
         }
-        setSyncingSheet(false);
-        return;
-      }
-
-      // 2. Fallback to API route if available
-      const res = await fetch('/api/library/sheet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sheetUrl })
-      });
-
-      const result = await res.json();
-      if (!res.ok || !result.success) {
-        throw new Error(result.error || 'Failed to fetch sheet');
-      }
-
-      if (Array.isArray(result.books) && result.books.length > 0) {
-        setSheetBooks(result.books);
-        if (typeof window !== 'undefined') {
-          try {
-            sessionStorage.setItem(cacheKey, JSON.stringify(result.books));
-          } catch {
-            // cache quota exceeded, ignore
-          }
-        }
+      } else if (parsedDirect.error) {
+        throw new Error(parsedDirect.error);
       }
     } catch (err: any) {
       console.warn('Could not sync live from Google Sheet, using catalog:', err.message);

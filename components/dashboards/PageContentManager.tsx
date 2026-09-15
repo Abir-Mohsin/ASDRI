@@ -32,6 +32,7 @@ import {
   compressUploadedImage 
 } from '@/lib/imageUtils';
 import { HeroStatItem } from '@/components/Hero';
+import { parseGoogleSheetBooks } from '@/lib/googleSheetParser';
 
 export interface CardItem {
   id?: string;
@@ -1461,13 +1462,8 @@ export default function PageContentManager() {
     setSheetTestResult(null);
     setSheetTestError(null);
     try {
-      const res = await fetch('/api/library/sheet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sheetUrl: googleSheetsUrl })
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
+      const data = await parseGoogleSheetBooks(googleSheetsUrl);
+      if (!data.success) {
         throw new Error(data.error || 'Failed to parse data from Google Sheet.');
       }
       setSheetTestResult(data);
@@ -2848,7 +2844,7 @@ export default function PageContentManager() {
 
                       {/* Geometric Texture in Preview */}
                       {showPattern && (
-                        <div className="absolute inset-0 opacity-15 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] z-2 pointer-events-none" />
+                        <div className="absolute inset-0 opacity-15 bg-arabesque-pattern z-2 pointer-events-none" />
                       )}
 
                       {/* Content Preview */}

@@ -211,6 +211,10 @@ input::placeholder, textarea::placeholder {
   animation-play-state: paused;
 }
 
+.bg-arabesque-pattern {
+  background-image: url('https://www.transparenttextures.com/patterns/arabesque.png');
+}
+
 @media print {
   @page {
     size: auto;

@@ -88,7 +88,7 @@ export function DynamicPageRenderer({
             />
           </div>
         )}
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
+        <div className="absolute inset-0 opacity-10 bg-arabesque-pattern pointer-events-none"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4 font-serif text-amber-300">
             {title}

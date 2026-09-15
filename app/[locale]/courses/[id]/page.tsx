@@ -7,7 +7,7 @@ import { CourseDetailPageContent } from '@/components/CourseDetailPageContent';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 
-export const dynamicParams = true;
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const locales: Locale[] = ['en', 'bn', 'ar'];

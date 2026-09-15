@@ -29,6 +29,7 @@ import { AlumniDigitalVerificationModal } from './AlumniDigitalVerificationModal
 import { db } from '@/lib/firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 export type AlumniPortalTab = 
   | 'about' 
@@ -51,6 +52,10 @@ interface AlumniPublicPortalProps {
 }
 
 export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', locale = 'bn' }: AlumniPublicPortalProps) {
+  const searchParams = useSearchParams();
+  const queryTab = searchParams?.get('tab') || undefined;
+  const queryVerifyId = searchParams?.get('verifyId') || undefined;
+
   // Normalize initialTab
   const parseTab = (t?: string): AlumniPortalTab => {
     if (!t) return 'about';
@@ -64,7 +69,10 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
     return validTabs.includes(t as AlumniPortalTab) ? (t as AlumniPortalTab) : 'about';
   };
 
-  const [activeTab, setActiveTab] = useState<AlumniPortalTab>(parseTab(initialTab));
+  const effectiveInitialTab = queryTab || initialTab;
+  const effectiveVerifyId = queryVerifyId || verifyIdParam;
+
+  const [activeTab, setActiveTab] = useState<AlumniPortalTab>(parseTab(effectiveInitialTab));
 
   const [profiles, setProfiles] = useState<AlumniProfile[]>(INITIAL_ALUMNI_PROFILES);
   const [events, setEvents] = useState<AlumniEvent[]>(INITIAL_ALUMNI_EVENTS);
@@ -74,8 +82,8 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
 
   // Modals
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [isVerifyOpen, setIsVerifyOpen] = useState(!!verifyIdParam);
-  const [activeVerifyId, setActiveVerifyId] = useState(verifyIdParam);
+  const [isVerifyOpen, setIsVerifyOpen] = useState(!!effectiveVerifyId);
+  const [activeVerifyId, setActiveVerifyId] = useState(effectiveVerifyId);
 
   // Sidebar Controls (Desktop Collapsible & Mobile Slide-Over Drawer)
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);

@@ -794,7 +794,7 @@ export default function CoursesPage() {
                   />
                 ) : (
                   <div className="absolute inset-0 bg-[#064e3b] opacity-[0.95] flex flex-col justify-between p-3.5 text-white">
-                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
+                    <div className="absolute inset-0 opacity-10 bg-arabesque-pattern pointer-events-none"></div>
                     <div className="flex justify-between items-start">
                       <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded text-[9px] font-bold">
                         {course.code}
@@ -888,7 +888,7 @@ export default function CoursesPage() {
             
             {/* Poster or Cover Header */}
             <div className="h-44 bg-gradient-to-r from-emerald-800 to-[#064e3b] relative overflow-hidden flex-shrink-0 flex items-end p-5 text-white">
-              <div className="absolute inset-0 opacity-15 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
+              <div className="absolute inset-0 opacity-15 bg-arabesque-pattern pointer-events-none"></div>
               {selectedCourseDetails.posterUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img 
