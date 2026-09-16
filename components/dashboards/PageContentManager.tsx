@@ -776,19 +776,17 @@ export default function PageContentManager() {
     setDriveTestStatus('testing');
     setDriveTestMessage('গুগল ড্রাইভ ফাইল অ্যাক্সেস যাচাই করা হচ্ছে...');
 
-    try {
-      const res = await fetch(`/api/drive-image?id=${fileId}`);
-      if (res.ok && res.headers.get('content-type')?.startsWith('image/')) {
-        setDriveTestStatus('success');
-        setDriveTestMessage('ছবিটি গুগল ড্রাইভ থেকে সফলভাবে লোড হয়েছে এবং সরাসরি দৃশ্যমান হবে!');
-      } else {
-        setDriveTestStatus('error');
-        setDriveTestMessage('গুগল ড্রাইভে ফাইলটির অ্যাক্সেস "Restricted" (সীমাবদ্ধ)। অনুগ্রহ করে গুগল ড্রাইভে গিয়ে ফাইলে Right Click > Share > General Access-এ "Anyone with the link" (লিংক পাওয়া যে কেউ) নির্বাচন করুন।');
-      }
-    } catch {
+    const testUrl = `https://lh3.googleusercontent.com/d/${fileId}=w2560`;
+    const img = new window.Image();
+    img.onload = () => {
+      setDriveTestStatus('success');
+      setDriveTestMessage('ছবিটি গুগল ড্রাইভ থেকে সফলভাবে লোড হয়েছে এবং সরাসরি দৃশ্যমান হবে!');
+    };
+    img.onerror = () => {
       setDriveTestStatus('error');
-      setDriveTestMessage('ছবি লোড করা যায়নি। অনুগ্রহ করে ফাইল পারমিশন পরীক্ষা করুন অথবা সরাসরি আপলোড ট্যাব ব্যবহার করুন।');
-    }
+      setDriveTestMessage('গুগল ড্রাইভে ফাইলটির অ্যাক্সেস "Restricted" (সীমাবদ্ধ)। অনুগ্রহ করে গুগল ড্রাইভে গিয়ে ফাইলে Right Click > Share > General Access-এ "Anyone with the link" (লিংক পাওয়া যে কেউ) নির্বাচন করুন।');
+    };
+    img.src = testUrl;
   };
   const [overlayOpacity, setOverlayOpacity] = useState<number>(75);
   const [overlayStyle, setOverlayStyle] = useState<'emerald_gradient' | 'dark_gradient' | 'amber_gradient' | 'solid_dark' | 'subtle'>('emerald_gradient');

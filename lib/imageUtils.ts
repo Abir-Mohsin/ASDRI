@@ -52,8 +52,7 @@ export function isGoogleDriveUrl(url: string): boolean {
   return (
     trimmed.includes('drive.google.com') ||
     trimmed.includes('docs.google.com') ||
-    trimmed.includes('googleusercontent.com') ||
-    trimmed.includes('/api/drive-image')
+    trimmed.includes('googleusercontent.com')
   );
 }
 
@@ -67,8 +66,7 @@ export function getOptimizedImageUrl(url: string | undefined | null, defaultFall
 
   const fileId = extractGoogleDriveId(trimmed);
   if (fileId) {
-    // Return server-side proxy route which eliminates all CORS and referrer blocking
-    return `/api/drive-image?id=${fileId}`;
+    return `https://lh3.googleusercontent.com/d/${fileId}=w2560`;
   }
 
   return trimmed;
@@ -82,9 +80,8 @@ export function getDriveImageCandidates(url: string): string[] {
   if (!fileId) return [url];
 
   return [
-    `/api/drive-image?id=${fileId}`,
-    `https://drive.google.com/thumbnail?id=${fileId}&sz=w2560`,
     `https://lh3.googleusercontent.com/d/${fileId}=w2560`,
+    `https://drive.google.com/thumbnail?id=${fileId}&sz=w2560`,
     `https://drive.google.com/uc?export=view&id=${fileId}`
   ];
 }

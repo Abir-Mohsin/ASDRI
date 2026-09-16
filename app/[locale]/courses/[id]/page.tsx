@@ -7,22 +7,20 @@ import { CourseDetailPageContent } from '@/components/CourseDetailPageContent';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 
-export const dynamicParams = true;
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const locales: Locale[] = ['en', 'bn', 'ar'];
-  const courses = await fetchAllCourses();
+  let courses = await fetchAllCourses();
   
-  if (courses.length === 0) {
-    return [];
-  }
+  const courseIds = courses.length > 0
+    ? Array.from(new Set(courses.map(c => c.id).filter(Boolean)))
+    : ['general-islamic-studies'];
 
   const params: { locale: Locale; id: string }[] = [];
   for (const locale of locales) {
-    for (const course of courses) {
-      if (course.id) {
-        params.push({ locale, id: course.id });
-      }
+    for (const id of courseIds) {
+      params.push({ locale, id });
     }
   }
 
