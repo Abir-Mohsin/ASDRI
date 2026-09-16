@@ -6,7 +6,7 @@ import { Locale } from '@/lib/dictionary';
 import { ArrowRight, BookOpen, Sparkles, CheckCircle2 } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { getOptimizedImageUrl } from '@/lib/imageUtils';
+import { getOptimizedImageUrl, getDriveImageCandidates, isGoogleDriveUrl } from '@/lib/imageUtils';
 import { RenderIcon } from '@/lib/iconMap';
 
 export interface HeroStatItem {
@@ -56,6 +56,7 @@ interface HeroData {
 export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
   const [data, setData] = useState<HeroData | null>(null);
   const [imgError, setImgError] = useState(false);
+  const [candidateIndex, setCandidateIndex] = useState(0);
 
   useEffect(() => {
     const docRef = doc(db, 'site_pages', 'home');
@@ -65,6 +66,7 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
         if (docSnap.exists()) {
           setData(docSnap.data() as HeroData);
           setImgError(false);
+          setCandidateIndex(0);
         }
       },
       (err) => {
@@ -130,7 +132,10 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
     'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=2400&q=85';
 
   const rawImage = data?.bannerImageUrl || fallbackImage;
-  const optimizedImage = imgError ? fallbackImage : getOptimizedImageUrl(rawImage, fallbackImage);
+  const isDrive = isGoogleDriveUrl(rawImage);
+  const candidates = isDrive ? getDriveImageCandidates(rawImage) : [rawImage];
+  const currentCandidate = candidates[candidateIndex] || fallbackImage;
+  const optimizedImage = imgError ? fallbackImage : (isDrive ? currentCandidate : getOptimizedImageUrl(rawImage, fallbackImage));
 
   // Overlay Opacity: default 75%
   const opacityVal = typeof data?.overlayOpacity === 'number' ? Math.max(0, Math.min(100, data.overlayOpacity)) : 75;
@@ -183,12 +188,16 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          key={optimizedImage}
+          key={`${optimizedImage}_${candidateIndex}`}
           src={optimizedImage}
           alt="As-Sunnah Dawah and Research Institute Campus & Architecture"
           referrerPolicy="no-referrer"
           onError={() => {
-            if (!imgError) setImgError(true);
+            if (candidateIndex < candidates.length - 1) {
+              setCandidateIndex((prev) => prev + 1);
+            } else if (!imgError) {
+              setImgError(true);
+            }
           }}
           className="w-full h-full object-cover object-center scale-105 transform filter brightness-95 transition-transform duration-1000"
         />

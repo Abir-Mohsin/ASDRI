@@ -100,6 +100,8 @@ export function AlumniAdminManager() {
           });
           setProfiles(merged);
         }
+      }, (err) => {
+        console.warn('AlumniAdminManager profiles listener notice:', err?.message || err);
       });
 
       const qEvents = collection(db, 'alumni_events');
@@ -112,6 +114,8 @@ export function AlumniAdminManager() {
           });
           setEvents(merged);
         }
+      }, (err) => {
+        console.warn('AlumniAdminManager events listener notice:', err?.message || err);
       });
 
       const qJobs = collection(db, 'alumni_jobs');
@@ -124,7 +128,10 @@ export function AlumniAdminManager() {
           });
           setJobs(merged);
         }
+      }, (err) => {
+        console.warn('AlumniAdminManager jobs listener notice:', err?.message || err);
       });
+
 
       return () => {
         unsubProfiles();

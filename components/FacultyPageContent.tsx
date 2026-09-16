@@ -65,11 +65,17 @@ export function FacultyPageContent({ locale }: { locale: Locale }) {
   useEffect(() => {
     try {
       const docRef = doc(db, 'site_pages', 'faculty');
-      const unsubscribe = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          setPageSettings(docSnap.data() as any);
+      const unsubscribe = onSnapshot(
+        docRef, 
+        (docSnap) => {
+          if (docSnap.exists()) {
+            setPageSettings(docSnap.data() as any);
+          }
+        },
+        (error) => {
+          console.warn('Faculty page settings listener notice:', error?.message || error);
         }
-      });
+      );
       return () => unsubscribe();
     } catch (err) {
       console.warn('Firestore faculty page settings error:', err);

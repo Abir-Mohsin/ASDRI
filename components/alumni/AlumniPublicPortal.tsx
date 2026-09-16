@@ -277,6 +277,8 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
           });
           setProfiles(merged);
         }
+      }, (error) => {
+        console.warn('Alumni profiles listener notice:', error?.message || error);
       });
 
       // 2. Sync Events
@@ -295,6 +297,8 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
           });
           setEvents(merged);
         }
+      }, (error) => {
+        console.warn('Alumni events listener notice:', error?.message || error);
       });
 
       // 3. Sync Jobs
@@ -313,6 +317,8 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
           });
           setJobs(merged);
         }
+      }, (error) => {
+        console.warn('Alumni jobs listener notice:', error?.message || error);
       });
 
       // 4. Sync Announcements
@@ -331,7 +337,10 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
           });
           setAnnouncements(merged);
         }
+      }, (error) => {
+        console.warn('Alumni announcements listener notice:', error?.message || error);
       });
+
 
       return () => {
         unsubscribeProfiles();

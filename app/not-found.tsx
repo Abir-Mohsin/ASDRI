@@ -2,17 +2,19 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-slate-50 text-slate-900">
-      <h1 className="text-6xl font-extrabold text-[#064e3b] font-serif mb-4">404</h1>
-      <h2 className="text-2xl font-bold mb-2">পৃষ্ঠাটি পাওয়া যায়নি (Page Not Found)</h2>
-      <p className="text-slate-600 max-w-md mb-6">
-        আপনি যে পৃষ্ঠাটি খুঁজছেন তা স্থানান্তরিত হয়েছে অথবা মুছে ফেলা হয়েছে।
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-slate-800 p-6 text-center">
+      <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 font-bold text-2xl mb-4">
+        404
+      </div>
+      <h1 className="text-2xl font-bold text-slate-900 mb-2">Page Not Found / পৃষ্ঠাটি পাওয়া যায়নি</h1>
+      <p className="text-sm text-slate-600 max-w-md mb-6">
+        The page you are looking for does not exist or has been moved.
       </p>
       <Link
-        href="/bn"
-        className="px-6 py-3 bg-[#064e3b] text-white font-bold rounded-xl hover:bg-emerald-900 transition-colors"
+        href="/"
+        className="px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-sm font-semibold transition-colors"
       >
-        মূল পাতায় ফিরে যান
+        Return to Home / মূল পাতায় ফিরে যান
       </Link>
     </div>
   );

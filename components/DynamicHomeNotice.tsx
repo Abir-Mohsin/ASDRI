@@ -16,11 +16,18 @@ export function DynamicHomeNotice({ locale = 'en' }: { locale?: 'en' | 'bn' | 'a
 
   useEffect(() => {
     const docRef = doc(db, 'site_pages', 'home');
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setData(docSnap.data() as any);
+    const unsubscribe = onSnapshot(
+      docRef, 
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setData(docSnap.data() as any);
+        }
+      },
+      (error) => {
+        // Silently handle permission or connection fallback
+        console.warn('DynamicHomeNotice listener notice:', error?.message || error);
       }
-    });
+    );
     return () => unsubscribe();
   }, []);
 

@@ -9,27 +9,41 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
+    function isSuperAdminEmail() {
+      return isAuthenticated() && 
+             request.auth.token != null && 
+             'email' in request.auth.token && 
+             request.auth.token.email == 'abirmohsin02@gmail.com';
+    }
+
     function hasRole(role) {
-      let path = /databases/$(database)/documents/users/$(request.auth.uid);
-      return exists(path) && get(path).data.role == role;
+      return isAuthenticated() && 
+             request.auth.uid != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+             'role' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
     }
     
     function isAdmin() {
-      return hasRole('admin') || hasRole('super_admin');
+      return isAuthenticated() && (
+        isSuperAdminEmail() ||
+        hasRole('admin') || 
+        hasRole('super_admin')
+      );
     }
 
     function isTeacher() {
-      return hasRole('teacher') || hasRole('academic_officer');
+      return isAuthenticated() && (hasRole('teacher') || hasRole('academic_officer') || isAdmin());
     }
 
     function isLibraryStaff() {
-      return hasRole('library_staff') || isAdmin();
+      return isAuthenticated() && (hasRole('library_staff') || isAdmin());
     }
 
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isOwner(userId) || isAdmin();
-      allow update, delete: if isAdmin() || isOwner(userId);
+      allow read: if true;
+      allow create, update: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
     }
     
     match /users_profile/{userId} {
@@ -92,6 +106,11 @@ service cloud.firestore {
     }
 
     match /library_books/{bookId} {
+      allow read: if true;
+      allow write: if isLibraryStaff();
+    }
+
+    match /library_resources/{resourceId} {
       allow read: if true;
       allow write: if isLibraryStaff();
     }
@@ -170,6 +189,12 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAuthenticated();
       allow delete: if isAdmin();
+    }
+
+    match /alumni_contributions/{contribId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
     }
 
     // Default deny for everything else

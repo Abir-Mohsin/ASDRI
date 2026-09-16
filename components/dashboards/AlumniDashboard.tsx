@@ -111,6 +111,8 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
             setProfile(found);
           }
         }
+      }, (err) => {
+        console.warn('AlumniDashboard profiles listener notice:', err?.message || err);
       });
 
       // 2. Sync events
@@ -124,6 +126,8 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
           });
           setAllEvents(merged);
         }
+      }, (err) => {
+        console.warn('AlumniDashboard events listener notice:', err?.message || err);
       });
 
       // 3. Sync jobs
@@ -137,6 +141,8 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
           });
           setAllJobs(merged);
         }
+      }, (err) => {
+        console.warn('AlumniDashboard jobs listener notice:', err?.message || err);
       });
 
       // 4. Sync contributions
@@ -150,7 +156,10 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
           });
           setContributions(merged);
         }
+      }, (err) => {
+        console.warn('AlumniDashboard contributions listener notice:', err?.message || err);
       });
+
 
       return () => {
         unsubProfiles();

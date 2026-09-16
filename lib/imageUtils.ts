@@ -32,6 +32,11 @@ export function extractGoogleDriveId(url: string): string | null {
   const openMatch = trimmed.match(/open\?.*id=([a-zA-Z0-9_-]{15,})/);
   if (openMatch && openMatch[1]) return openMatch[1];
 
+  // Pattern 6b: Direct raw File ID (33+ characters alphanumeric string)
+  if (/^[a-zA-Z0-9_-]{25,60}$/.test(trimmed)) {
+    return trimmed;
+  }
+
   // Pattern 7: Any 25+ char alphanumeric ID in a google drive/docs/usercontent URL
   if (trimmed.includes('drive.google.com') || trimmed.includes('docs.google.com') || trimmed.includes('googleusercontent.com')) {
     const rawIdMatch = trimmed.match(/([a-zA-Z0-9_-]{25,})/);
@@ -47,7 +52,8 @@ export function isGoogleDriveUrl(url: string): boolean {
   return (
     trimmed.includes('drive.google.com') ||
     trimmed.includes('docs.google.com') ||
-    trimmed.includes('googleusercontent.com')
+    trimmed.includes('googleusercontent.com') ||
+    trimmed.includes('/api/drive-image')
   );
 }
 
@@ -61,8 +67,8 @@ export function getOptimizedImageUrl(url: string | undefined | null, defaultFall
 
   const fileId = extractGoogleDriveId(trimmed);
   if (fileId) {
-    // lh3.googleusercontent.com/d/FILE_ID is Google's direct CDN proxy for Drive images that works seamlessly in <img> tags
-    return `https://lh3.googleusercontent.com/d/${fileId}`;
+    // Return server-side proxy route which eliminates all CORS and referrer blocking
+    return `/api/drive-image?id=${fileId}`;
   }
 
   return trimmed;
@@ -76,8 +82,9 @@ export function getDriveImageCandidates(url: string): string[] {
   if (!fileId) return [url];
 
   return [
-    `https://lh3.googleusercontent.com/d/${fileId}`,
+    `/api/drive-image?id=${fileId}`,
     `https://drive.google.com/thumbnail?id=${fileId}&sz=w2560`,
+    `https://lh3.googleusercontent.com/d/${fileId}=w2560`,
     `https://drive.google.com/uc?export=view&id=${fileId}`
   ];
 }

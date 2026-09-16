@@ -11,6 +11,8 @@ import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/useAuthStore';
 import Link from 'next/link';
 import { BrandLogo } from '@/components/BrandLogo';
+import { getGoogleAuthErrorMessage, isUnauthorizedDomainError } from '@/lib/authErrors';
+import { UnauthorizedDomainAlert } from '@/components/UnauthorizedDomainAlert';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -59,8 +61,11 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [resetError, setResetError] = useState<string | null>(null);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showUnauthorizedDomainAlert, setShowUnauthorizedDomainAlert] = useState(false);
   
   const router = useRouter();
+
   const params = useParams();
   const locale = (params?.locale as string || 'en') as keyof typeof dict;
   const activeDict = dict[locale] || dict.en;
@@ -198,22 +203,30 @@ export default function LoginPage() {
     setError(null);
     setResetMessage(null);
     setResetError(null);
+    setIsGoogleLoading(true);
     try {
       const userCredential = await signInWithPopup(auth, googleProvider);
       const user = userCredential.user;
       
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (!userDoc.exists()) {
-        const role = user.email === 'abirmohsin02@gmail.com' ? 'super_admin' : 'applicant';
+      // Ensure user profile in Firestore without blocking auth flow if offline/delay
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
         
-        await setDoc(userDocRef, {
-          name: user.displayName || 'Unknown',
-          email: user.email,
-          role: role,
-          createdAt: new Date().toISOString(),
-        });
+        if (!userDoc.exists()) {
+          const isSuperAdmin = user.email === 'abirmohsin02@gmail.com';
+          const role = isSuperAdmin ? 'super_admin' : 'applicant';
+          
+          await setDoc(userDocRef, {
+            name: user.displayName || 'User',
+            email: user.email,
+            role: role,
+            status: isSuperAdmin ? 'approved' : 'approved',
+            createdAt: new Date().toISOString(),
+          });
+        }
+      } catch (firestoreErr) {
+        console.warn('Firestore profile sync postponed:', firestoreErr);
       }
       
       let targetPath = `/${locale}/dashboard`;
@@ -227,13 +240,20 @@ export default function LoginPage() {
       router.push(targetPath);
     } catch (err: any) {
       console.error('Google Auth Error:', err);
-      setError(locale === 'bn' 
-        ? 'গুগল দিয়ে লগইন ব্যর্থ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।' 
-        : locale === 'ar' 
-        ? 'فشل تسجيل الدخول باستخدام جوجل. يرجى المحاولة مرة أخرى.' 
-        : 'Failed to sign in with Google. Please try again.');
+      // Suppress alarming error if user simply closed the popup
+      if (err?.code === 'auth/popup-closed-by-user' || err?.code === 'auth/cancelled-popup-request') {
+        return;
+      }
+      if (isUnauthorizedDomainError(err)) {
+        setShowUnauthorizedDomainAlert(true);
+      } else {
+        setError(getGoogleAuthErrorMessage(err, (locale as string) || 'bn'));
+      }
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -244,6 +264,14 @@ export default function LoginPage() {
             {activeDict.title}
           </h2>
         </div>
+
+        {showUnauthorizedDomainAlert && (
+          <UnauthorizedDomainAlert
+            locale={locale as string}
+            onDismiss={() => setShowUnauthorizedDomainAlert(false)}
+          />
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {error && (
             <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm border-l-4 border-red-500 font-medium">
@@ -323,8 +351,10 @@ export default function LoginPage() {
 
           <div className="mt-6">
             <button
+              type="button"
               onClick={handleGoogleSignIn}
-              className="w-full flex justify-center py-3 px-4 border border-slate-300 rounded-md shadow-sm bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#064e3b] transition-colors"
+              disabled={isGoogleLoading || isSubmitting}
+              className="w-full flex items-center justify-center py-3 px-4 border border-slate-300 rounded-md shadow-sm bg-white text-sm font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#064e3b] transition-colors disabled:opacity-50"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -332,9 +362,12 @@ export default function LoginPage() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              {activeDict.googleBtn}
+              {isGoogleLoading 
+                ? (locale === 'bn' ? 'গুগলে কানেক্ট হচ্ছে...' : locale === 'ar' ? 'جاري الاتصال بجوجل...' : 'Connecting to Google...') 
+                : activeDict.googleBtn}
             </button>
           </div>
+
         </div>
 
         <div className="text-center mt-6 flex flex-col gap-3">

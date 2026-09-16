@@ -49,6 +49,8 @@ export function LibraryStaffDashboard() {
   const [bookTitle, setBookTitle] = useState('');
   const [bookAuthor, setBookAuthor] = useState('');
   const [bookCategoryForm, setBookCategoryForm] = useState('Tafseer & Quranic Sciences');
+  const [isCustomBookCat, setIsCustomBookCat] = useState(false);
+  const [customBookCatInput, setCustomBookCatInput] = useState('');
   const [bookLanguage, setBookLanguage] = useState('Arabic');
   const [bookIsbn, setBookIsbn] = useState('');
   const [bookLocation, setBookLocation] = useState('Rack A-1');
@@ -234,6 +236,7 @@ export function LibraryStaffDashboard() {
 
     try {
       const stockNum = Number(bookTotalStock);
+      const finalCategory = (isCustomBookCat ? customBookCatInput.trim() : bookCategoryForm.trim()) || 'General';
       
       if (editingBookId) {
         // Editing existing book
@@ -245,7 +248,7 @@ export function LibraryStaffDashboard() {
         await updateDoc(bookRef, {
           title: bookTitle,
           author: bookAuthor,
-          category: bookCategoryForm,
+          category: finalCategory,
           language: bookLanguage,
           isbn: bookIsbn,
           location: bookLocation,
@@ -260,7 +263,7 @@ export function LibraryStaffDashboard() {
         await setDoc(bookRef, {
           title: bookTitle,
           author: bookAuthor,
-          category: bookCategoryForm,
+          category: finalCategory,
           language: bookLanguage,
           isbn: bookIsbn,
           location: bookLocation,
@@ -276,6 +279,8 @@ export function LibraryStaffDashboard() {
       setBookIsbn('');
       setBookLocation('Rack A-1');
       setBookTotalStock('5');
+      setIsCustomBookCat(false);
+      setCustomBookCatInput('');
       setShowBookForm(false);
       setEditingBookId(null);
       await fetchData();
@@ -289,7 +294,18 @@ export function LibraryStaffDashboard() {
     setEditingBookId(book.id);
     setBookTitle(book.title);
     setBookAuthor(book.author);
-    setBookCategoryForm(book.category);
+    const standardCats = [
+      'Tafseer & Quranic Sciences',
+      'Hadith Collections',
+      'Islamic Jurisprudence (Fiqh)',
+      'Islamic History & Seerah',
+      'Arabic Linguistics',
+      'Academic Research Papers'
+    ];
+    const isCustom = book.category && !standardCats.includes(book.category);
+    setIsCustomBookCat(Boolean(isCustom));
+    setCustomBookCatInput(isCustom ? book.category : '');
+    setBookCategoryForm(book.category || 'Tafseer & Quranic Sciences');
     setBookLanguage(book.language);
     setBookIsbn(book.isbn || '');
     setBookLocation(book.location || 'Rack A-1');
@@ -721,19 +737,64 @@ export function LibraryStaffDashboard() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-slate-700 uppercase">Category Subject</label>
-                    <select 
-                      value={bookCategoryForm}
-                      onChange={(e) => setBookCategoryForm(e.target.value)}
-                      className="w-full text-xs bg-white text-slate-900 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-emerald-700 focus:outline-none font-medium"
-                    >
-                      <option value="Tafseer & Quranic Sciences">Tafseer & Quranic Sciences</option>
-                      <option value="Hadith Collections">Hadith Collections</option>
-                      <option value="Islamic Jurisprudence (Fiqh)">Islamic Jurisprudence (Fiqh)</option>
-                      <option value="Islamic History & Seerah">Islamic History & Seerah</option>
-                      <option value="Arabic Linguistics">Arabic Linguistics</option>
-                      <option value="Academic Research Papers">Academic Research Papers</option>
-                    </select>
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-bold text-slate-700 uppercase">Category Subject *</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextState = !isCustomBookCat;
+                          setIsCustomBookCat(nextState);
+                          if (nextState) {
+                            setCustomBookCatInput(bookCategoryForm);
+                          }
+                        }}
+                        className="text-[10px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+                      >
+                        {isCustomBookCat ? 'Select from list' : '+ Custom Category'}
+                      </button>
+                    </div>
+
+                    {isCustomBookCat ? (
+                      <div>
+                        <input
+                          type="text"
+                          required
+                          value={customBookCatInput}
+                          onChange={(e) => {
+                            setCustomBookCatInput(e.target.value);
+                            setBookCategoryForm(e.target.value);
+                          }}
+                          placeholder="e.g. Usul al-Fiqh, Islamic Philosophy"
+                          className="w-full text-xs bg-emerald-50/50 text-slate-900 border border-emerald-300 rounded px-3 py-2 focus:ring-1 focus:ring-emerald-700 focus:outline-none font-medium"
+                          autoFocus
+                        />
+                        <span className="text-[10px] text-emerald-700 mt-0.5 block">
+                          Custom category will be saved to this book
+                        </span>
+                      </div>
+                    ) : (
+                      <select 
+                        value={bookCategoryForm}
+                        onChange={(e) => {
+                          if (e.target.value === '__custom__') {
+                            setIsCustomBookCat(true);
+                            setCustomBookCatInput('');
+                            setBookCategoryForm('');
+                          } else {
+                            setBookCategoryForm(e.target.value);
+                          }
+                        }}
+                        className="w-full text-xs bg-white text-slate-900 border border-slate-300 rounded px-3 py-2 focus:ring-1 focus:ring-emerald-700 focus:outline-none font-medium"
+                      >
+                        <option value="Tafseer & Quranic Sciences">Tafseer & Quranic Sciences</option>
+                        <option value="Hadith Collections">Hadith Collections</option>
+                        <option value="Islamic Jurisprudence (Fiqh)">Islamic Jurisprudence (Fiqh)</option>
+                        <option value="Islamic History & Seerah">Islamic History & Seerah</option>
+                        <option value="Arabic Linguistics">Arabic Linguistics</option>
+                        <option value="Academic Research Papers">Academic Research Papers</option>
+                        <option value="__custom__">✏️ + Type New / Custom Category...</option>
+                      </select>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-2">

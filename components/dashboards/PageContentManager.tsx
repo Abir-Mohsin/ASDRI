@@ -762,6 +762,34 @@ export default function PageContentManager() {
   const [pageContent, setPageContent] = useState('');
   const [bannerImageUrl, setBannerImageUrl] = useState('');
   const [rawBannerDriveUrl, setRawBannerDriveUrl] = useState('');
+  const [driveTestStatus, setDriveTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
+  const [driveTestMessage, setDriveTestMessage] = useState<string>('');
+
+  const testDriveUrl = async (urlToTest: string) => {
+    const fileId = extractGoogleDriveId(urlToTest);
+    if (!fileId) {
+      setDriveTestStatus('error');
+      setDriveTestMessage('সঠিক গুগল ড্রাইভ ফাইল আইডি পাওয়া যায়নি। অনুগ্রহ করে সঠিক ড্রাইভ শেয়ারিং লিংক দিন।');
+      return;
+    }
+
+    setDriveTestStatus('testing');
+    setDriveTestMessage('গুগল ড্রাইভ ফাইল অ্যাক্সেস যাচাই করা হচ্ছে...');
+
+    try {
+      const res = await fetch(`/api/drive-image?id=${fileId}`);
+      if (res.ok && res.headers.get('content-type')?.startsWith('image/')) {
+        setDriveTestStatus('success');
+        setDriveTestMessage('ছবিটি গুগল ড্রাইভ থেকে সফলভাবে লোড হয়েছে এবং সরাসরি দৃশ্যমান হবে!');
+      } else {
+        setDriveTestStatus('error');
+        setDriveTestMessage('গুগল ড্রাইভে ফাইলটির অ্যাক্সেস "Restricted" (সীমাবদ্ধ)। অনুগ্রহ করে গুগল ড্রাইভে গিয়ে ফাইলে Right Click > Share > General Access-এ "Anyone with the link" (লিংক পাওয়া যে কেউ) নির্বাচন করুন।');
+      }
+    } catch {
+      setDriveTestStatus('error');
+      setDriveTestMessage('ছবি লোড করা যায়নি। অনুগ্রহ করে ফাইল পারমিশন পরীক্ষা করুন অথবা সরাসরি আপলোড ট্যাব ব্যবহার করুন।');
+    }
+  };
   const [overlayOpacity, setOverlayOpacity] = useState<number>(75);
   const [overlayStyle, setOverlayStyle] = useState<'emerald_gradient' | 'dark_gradient' | 'amber_gradient' | 'solid_dark' | 'subtle'>('emerald_gradient');
   const [showPattern, setShowPattern] = useState<boolean>(true);
@@ -2551,27 +2579,84 @@ export default function PageContentManager() {
                         )}
                       </div>
                       
-                      <div className="space-y-1.5">
-                        <input
-                          type="url"
-                          value={rawBannerDriveUrl}
-                          onChange={(e) => {
-                            const val = e.target.value.trim();
-                            setRawBannerDriveUrl(val);
-                            if (val) {
-                              const optimized = getOptimizedImageUrl(val);
-                              setBannerImageUrl(optimized);
-                            }
-                          }}
-                          placeholder="https://drive.google.com/file/d/1B2C3D4E5F6G7H8I9J/view?usp=sharing"
-                          className="w-full text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-mono text-slate-800 focus:border-emerald-600 focus:bg-white"
-                        />
-                        <div className="text-[11px] text-slate-500 bg-amber-50/70 border border-amber-200/60 p-2.5 rounded-lg flex items-start gap-2">
-                          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                          <div>
-                            <span className="font-bold text-amber-900">টিপস:</span> গুগল ড্রাইভে ছবির শেয়ারিং পারমিশন অবশ্যই <strong>"Anyone with the link can view" (লিংক পাওয়া যে কেউ দেখতে পারবে)</strong> নিশ্চিত করুন। আমাদের সিস্টেম স্বয়ংক্রিয়ভাবে সরাসরি উচ্চমানের হাই-স্পিড সিডিএন লিংক প্রস্তুত করবে।
-                          </div>
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <input
+                            type="url"
+                            value={rawBannerDriveUrl}
+                            onChange={(e) => {
+                              const val = e.target.value.trim();
+                              setRawBannerDriveUrl(val);
+                              setDriveTestStatus('idle');
+                              setDriveTestMessage('');
+                              if (val) {
+                                const optimized = getOptimizedImageUrl(val);
+                                setBannerImageUrl(optimized);
+                              }
+                            }}
+                            placeholder="https://drive.google.com/file/d/1B2C3D4E5F6G7H8I9J/view?usp=sharing"
+                            className="flex-1 text-xs p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-mono text-slate-800 focus:border-emerald-600 focus:bg-white"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => testDriveUrl(rawBannerDriveUrl || bannerImageUrl)}
+                            disabled={driveTestStatus === 'testing' || (!rawBannerDriveUrl && !bannerImageUrl)}
+                            className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 disabled:opacity-50 text-white rounded-xl text-xs font-bold shrink-0 transition-colors flex items-center gap-1.5"
+                          >
+                            {driveTestStatus === 'testing' ? (
+                              <>
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                <span>যাচাই হচ্ছে...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Eye className="w-3.5 h-3.5" />
+                                <span>লিংক টেস্ট করুন</span>
+                              </>
+                            )}
+                          </button>
                         </div>
+
+                        {/* Test Status Feedback */}
+                        {driveTestStatus === 'success' && (
+                          <div className="text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-300 p-2.5 rounded-lg flex items-start gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <div>
+                              <strong className="font-bold">সফল:</strong> {driveTestMessage}
+                            </div>
+                          </div>
+                        )}
+
+                        {driveTestStatus === 'error' && (
+                          <div className="text-[11px] text-red-800 bg-red-50 border border-red-300 p-3 rounded-lg space-y-1.5">
+                            <div className="flex items-start gap-2 font-bold text-red-900">
+                              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                              <span>ছবি লোড হচ্ছে না! (Google Drive Permission Error)</span>
+                            </div>
+                            <p className="text-slate-700 pl-6 text-[11px] leading-relaxed">
+                              {driveTestMessage}
+                            </p>
+                            <div className="pl-6 pt-1 flex items-center gap-2">
+                              <span className="text-[10px] text-slate-500">অথবা:</span>
+                              <button
+                                type="button"
+                                onClick={() => setBannerSourceMode('upload')}
+                                className="text-[11px] font-bold text-emerald-700 underline hover:text-emerald-900"
+                              >
+                                সরাসরি কম্পিউটার/মোবাইল থেকে আপলোড করুন →
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
+                        {driveTestStatus === 'idle' && (
+                          <div className="text-[11px] text-slate-500 bg-amber-50/70 border border-amber-200/60 p-2.5 rounded-lg flex items-start gap-2">
+                            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <div>
+                              <span className="font-bold text-amber-900">টিপস:</span> গুগল ড্রাইভে ছবির শেয়ারিং পারমিশন অবশ্যই <strong>"Anyone with the link" (লিংক পাওয়া যে কেউ দেখতে পারবে)</strong> নিশ্চিত করুন। ফাইল 'Restricted' থাকলে গুগল ছবিটি ওয়েবসাইট ভিজিটরদের দেখায় না।
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {extractGoogleDriveId(rawBannerDriveUrl || bannerImageUrl) && (
@@ -2580,7 +2665,7 @@ export default function PageContentManager() {
                             File ID: {extractGoogleDriveId(rawBannerDriveUrl || bannerImageUrl)}
                           </span>
                           <span className="text-emerald-700 font-medium">
-                            ✓ Direct HD CDN Thumbnail Activated
+                            ✓ Direct HD Proxy Active
                           </span>
                         </div>
                       )}

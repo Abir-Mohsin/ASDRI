@@ -145,9 +145,32 @@
         "readBy": { "type": "array" }
       },
       "required": ["senderId", "senderName", "title", "message", "targetAudience", "createdAt"]
+    },
+    "libraryResource": {
+      "title": "LibraryResource",
+      "description": "Digital library books, research papers, and PDFs",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "author": { "type": "string" },
+        "category": { "type": "string" },
+        "type": { "type": "string" },
+        "size": { "type": "string" },
+        "reads": { "type": "number" },
+        "language": { "type": "string" },
+        "downloadUrl": { "type": "string" },
+        "driveUrl": { "type": "string" },
+        "previewUrl": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "author", "category", "type", "size"]
     }
   },
   "firestore": {
+    "/library_resources/{resourceId}": {
+      "schema": "libraryResource",
+      "description": "Digital library resources and scholarly uploads"
+    },
     "/contact_messages/{messageId}": {
       "schema": "contactMessage",
       "description": "User inquiries and contact messages"
