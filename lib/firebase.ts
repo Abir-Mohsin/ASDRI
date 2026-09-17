@@ -1,22 +1,33 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore, initializeFirestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import firebaseConfig from "../firebase-applet-config.json";
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-
-const db = typeof window !== 'undefined' ? (firebaseConfig.firestoreDatabaseId
-  ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
-  : getFirestore(app)) : null as unknown as ReturnType<typeof getFirestore>;
-
-const storage = typeof window !== 'undefined' ? getStorage(app) : null as unknown as ReturnType<typeof getStorage>;
-
-const auth = typeof window !== 'undefined' ? getAuth(app) : null as unknown as ReturnType<typeof getAuth>;
-const googleProvider = typeof window !== 'undefined' ? new GoogleAuthProvider() : null as unknown as GoogleAuthProvider;
-if (googleProvider) {
-  googleProvider.setCustomParameters({ prompt: "select_account" });
+let config: any = {};
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  config = require("../firebase-applet-config.json");
+} catch {
+  config = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  };
 }
 
+const app = !getApps().length ? initializeApp(config) : getApp();
+
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
+
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
+
 export { app, auth, db, storage, googleProvider };
+
 
