@@ -11,11 +11,11 @@ export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const locales: Locale[] = ['en', 'bn', 'ar'];
-  let courses = await fetchAllCourses();
+  const courses = await fetchAllCourses();
   
   const courseIds = courses.length > 0
     ? Array.from(new Set(courses.map(c => c.id).filter(Boolean)))
-    : ['general-islamic-studies'];
+    : ['not-found'];
 
   const params: { locale: Locale; id: string }[] = [];
   for (const locale of locales) {

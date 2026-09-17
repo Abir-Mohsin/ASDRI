@@ -1,6 +1,7 @@
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { getOptimizedImageUrl } from '@/lib/imageUtils';
+import { COURSES } from '@/lib/constants/courses';
 
 export interface Course {
   id: string;
@@ -83,15 +84,15 @@ export async function fetchAllCourses(): Promise<Course[]> {
           return dbCourses;
         }
       }
-    } catch (err) {
-      console.warn('Notice loading courses from Firestore:', err);
+    } catch {
+      // Return empty array when Firestore is empty or inaccessible
     }
   }
   return [];
 }
 
 export async function fetchCourseById(courseId: string): Promise<Course | null> {
-  // Check Firestore
+  // Check Firestore first if available
   if (typeof window !== 'undefined' || process.env.NEXT_RUNTIME === 'nodejs') {
     try {
       if (db) {
@@ -134,8 +135,8 @@ export async function fetchCourseById(courseId: string): Promise<Course | null> 
           };
         }
       }
-    } catch (err) {
-      console.warn(`Notice fetching course ${courseId} from db:`, err);
+    } catch {
+      // Fall through
     }
   }
 

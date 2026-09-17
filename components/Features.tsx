@@ -106,6 +106,29 @@ export function Features({ dict, locale }: { dict: any; locale: Locale }) {
             <div className="animate-spin rounded-full h-9 w-9 border-b-2 border-[#064e3b]"></div>
             <span className="text-xs text-slate-500 font-medium">{activeDict.loading}</span>
           </div>
+        ) : courses.length === 0 ? (
+          <div className="bg-white rounded-3xl p-10 sm:p-14 text-center border border-slate-200 shadow-sm max-w-2xl mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-100/80 text-[#064e3b] flex items-center justify-center mx-auto mb-4 border border-emerald-300">
+              <BookOpen className="w-7 h-7 text-[#064e3b]" />
+            </div>
+            <h3 className="text-lg sm:text-xl font-bold font-serif text-[#064e3b] mb-2">
+              {locale === 'bn' ? 'আসন্ন সেশনের পাঠ্যক্রম ও কোর্স' : locale === 'ar' ? 'البرامج الأكاديمية للعام الجديد' : 'Academic Programs for Upcoming Session'}
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+              {locale === 'bn' 
+                ? 'ইনস্টিটিউটের নতুন শিক্ষাবর্ষের অনুমোদিত কোর্স ও পাঠ্যক্রমসমূহ নির্ধারিত প্রক্রিয়ায় হালনাগাদ করা হচ্ছে। ভর্তি সংক্রান্ত তথ্য জানতে সরাসরি ভর্তি পোর্টাল পরিদর্শন করুন।' 
+                : locale === 'ar'
+                ? 'يتم تحديث المناهج والبرامج الأكاديمية للدفعة القادمة. للاطلاع على شروط القبول والتسجيل، يرجى زيارة بوابة القبول والتسجيل.'
+                : 'Curricula and specialized programs for the upcoming academic session are being published. To view admission details and requirements, please visit the Admissions Portal.'}
+            </p>
+            <Link
+              href={`/${locale}/admission`}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#064e3b] hover:bg-emerald-900 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all cursor-pointer"
+            >
+              <GraduationCap className="w-4 h-4 text-amber-300" />
+              <span>{locale === 'bn' ? 'ভর্তি তথ্য ও আবেদন' : locale === 'ar' ? 'بوابة القبول' : 'Admissions Portal'}</span>
+            </Link>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
             {courses.slice(0, 6).map((course) => {

@@ -12,7 +12,8 @@ import { db } from '@/lib/firebase';
 import { defaultFatwas, FatwaItem } from '@/lib/defaultFatwaData';
 
 export function FatwaPortalContent({ locale }: { locale: Locale }) {
-  const [fatwas, setFatwas] = useState<FatwaItem[]>(defaultFatwas);
+  const [fatwas, setFatwas] = useState<FatwaItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [activeFatwa, setActiveFatwa] = useState<FatwaItem | null>(null);
@@ -29,6 +30,7 @@ export function FatwaPortalContent({ locale }: { locale: Locale }) {
 
   useEffect(() => {
     async function loadFatwas() {
+      setIsLoading(true);
       try {
         const q = query(collection(db, 'fatwas'), orderBy('date', 'desc'));
         const snap = await getDocs(q);
@@ -37,13 +39,15 @@ export function FatwaPortalContent({ locale }: { locale: Locale }) {
             id: d.id,
             ...(d.data() as any)
           }));
-          // Merge with default fatwas so list is rich
-          const existingIds = new Set(dbFatwas.map(f => f.id));
-          const merged = [...dbFatwas, ...defaultFatwas.filter(f => !existingIds.has(f.id))];
-          setFatwas(merged);
+          setFatwas(dbFatwas);
+        } else {
+          setFatwas([]);
         }
       } catch (err) {
-        console.warn('Using default fatwas data:', err);
+        console.warn('Notice loading fatwas from Firestore:', err);
+        setFatwas([]);
+      } finally {
+        setIsLoading(false);
       }
     }
     loadFatwas();
@@ -398,11 +402,33 @@ export function FatwaPortalContent({ locale }: { locale: Locale }) {
         ) : (
           /* Fatwa Grid / List */
           <div className="space-y-4">
-            {filteredFatwas.length === 0 ? (
-              <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
-                <AlertCircle className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                <p className="text-sm font-bold text-slate-600">কোনো ফাতওয়া খুঁজে পাওয়া যায়নি।</p>
-                <p className="text-xs text-slate-400 mt-1">অন্য কোনো কীওয়ার্ড দিয়ে অনুসন্ধান করুন অথবা সরাসরি আপনার প্রশ্নটি পেশ করুন।</p>
+            {isLoading ? (
+              <div className="py-16 text-center flex flex-col justify-center items-center gap-3">
+                <div className="animate-spin rounded-full h-9 w-9 border-b-2 border-[#064e3b]"></div>
+                <span className="text-xs text-slate-500 font-medium">ফাতওয়া আর্কাইভ লোড হচ্ছে...</span>
+              </div>
+            ) : filteredFatwas.length === 0 ? (
+              <div className="bg-white rounded-3xl p-10 sm:p-14 text-center border border-slate-200 shadow-sm max-w-2xl mx-auto">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-100/80 text-[#064e3b] flex items-center justify-center mx-auto mb-4 border border-emerald-300">
+                  <Shield className="w-7 h-7 text-[#064e3b]" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold font-serif text-[#064e3b] mb-2">
+                  {locale === 'bn' ? 'দারুল ইফতা ও ফাতওয়া আর্কাইভে স্বাগতম' : locale === 'ar' ? 'مرحبًا بكم في بوابة الإفتاء والبحوث الشرعية' : 'Welcome to Darul Ifta & Fatwa Portal'}
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                  {locale === 'bn' 
+                    ? 'দারুল ইফতায় সংগৃহীত ও পর্যালোচিত ফাতওয়াসমূহ পর্যায়ক্রমে প্রকাশ করা হয়। আপনার যেকোনো শরয়ী জিজ্ঞাসা বা মাসআলার বিশুদ্ধ সমাধানের জন্য সরাসরি প্রশ্ন পেশ করতে পারেন।' 
+                    : locale === 'ar'
+                    ? 'يتم نشر الفتاوى المعتمدة من مجلس الإفتاء تباعًا. لطرح أي استفسار أو مسألة شرعية، يرجى تقديم سؤالك إلى دار الإفتاء.'
+                    : 'Verified rulings reviewed by our scholarly council are published here. To request a religious ruling, you may submit your inquiry directly to the council.'}
+                </p>
+                <button
+                  onClick={() => setIsAsking(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#064e3b] hover:bg-emerald-900 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all cursor-pointer"
+                >
+                  <HelpCircle className="w-4 h-4 text-amber-300" />
+                  <span>{labels.askBtn}</span>
+                </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

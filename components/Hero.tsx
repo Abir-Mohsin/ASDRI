@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Locale } from '@/lib/dictionary';
 import { ArrowRight, BookOpen, Sparkles, CheckCircle2 } from 'lucide-react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, collection } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { getOptimizedImageUrl, getDriveImageCandidates, isGoogleDriveUrl } from '@/lib/imageUtils';
 import { RenderIcon } from '@/lib/iconMap';
+import { COURSES } from '@/lib/constants/courses';
 
 export interface HeroStatItem {
   id?: string;
@@ -15,6 +16,7 @@ export interface HeroStatItem {
   label: string;
   subtitle?: string;
   icon?: string;
+  href?: string;
 }
 
 interface HeroData {
@@ -53,14 +55,35 @@ interface HeroData {
   stats?: HeroStatItem[];
 }
 
+function formatLocalizedNumber(num: number, loc: Locale): string {
+  if (loc === 'bn') {
+    const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return num.toString().replace(/\d/g, (d) => bnDigits[parseInt(d, 10)]);
+  }
+  if (loc === 'ar') {
+    const arDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    return num.toString().replace(/\d/g, (d) => arDigits[parseInt(d, 10)]);
+  }
+  return num.toString();
+}
+
 export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
   const [data, setData] = useState<HeroData | null>(null);
   const [imgError, setImgError] = useState(false);
   const [candidateIndex, setCandidateIndex] = useState(0);
 
+  // Live Admission Statistics from Firestore
+  const [admissionStats, setAdmissionStats] = useState({
+    totalApplications: 0,
+    approvedAdmissions: 0,
+    scholarshipApplicants: 0,
+    totalPrograms: COURSES.length,
+    isLoading: true
+  });
+
   useEffect(() => {
     const docRef = doc(db, 'site_pages', 'home');
-    const unsubscribe = onSnapshot(
+    const unsubscribeHome = onSnapshot(
       docRef,
       (docSnap) => {
         if (docSnap.exists()) {
@@ -73,7 +96,62 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
         console.warn('Hero real-time listener notice:', err);
       }
     );
-    return () => unsubscribe();
+
+    // Live listener for student admission applications
+    const appsRef = collection(db, 'applications');
+    const unsubscribeApps = onSnapshot(
+      appsRef,
+      (snapshot) => {
+        const total = snapshot.size;
+        let approved = 0;
+        let scholarships = 0;
+
+        snapshot.forEach((doc) => {
+          const appData = doc.data();
+          if (appData.status === 'approved' || appData.status === 'admitted' || appData.isApproved) {
+            approved++;
+          }
+          if (appData.financialAidRequested || appData.isZakatEligible || appData.scholarshipStatus) {
+            scholarships++;
+          }
+        });
+
+        setAdmissionStats((prev) => ({
+          ...prev,
+          totalApplications: total,
+          approvedAdmissions: approved,
+          scholarshipApplicants: scholarships,
+          isLoading: false
+        }));
+      },
+      (err) => {
+        console.warn('Admission stats listener notice:', err);
+        setAdmissionStats((prev) => ({ ...prev, isLoading: false }));
+      }
+    );
+
+    // Live listener for courses count
+    const coursesRef = collection(db, 'courses');
+    const unsubscribeCourses = onSnapshot(
+      coursesRef,
+      (snapshot) => {
+        if (!snapshot.empty) {
+          setAdmissionStats((prev) => ({
+            ...prev,
+            totalPrograms: snapshot.size
+          }));
+        }
+      },
+      (err) => {
+        console.warn('Courses count listener notice:', err);
+      }
+    );
+
+    return () => {
+      unsubscribeHome();
+      unsubscribeApps();
+      unsubscribeCourses();
+    };
   }, []);
 
   const defaultBadgeText = {
@@ -228,12 +306,6 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
       {/* Centered max-width content container */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36 text-center">
         <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
-          {/* Institutional Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-950/85 border border-amber-400/50 text-amber-300 text-xs sm:text-sm font-bold shadow-md backdrop-blur-xs">
-            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="leading-none">{currentBadge}</span>
-          </div>
-
           {/* Hero Title */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white font-serif tracking-tight leading-[1.2] sm:leading-[1.2] drop-shadow-md">
             {heroTitle}
@@ -279,44 +351,89 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
           </div>
         </div>
 
-        {/* Dynamic English Key Statistics Cards (Placed cleanly below Hero content) */}
+        {/* Live Institutional Admission & Academic Statistics Cards */}
         {(() => {
-          const defaultStats: HeroStatItem[] = [
-            { id: 'stat-1', value: '15,000+', label: 'Active Students', subtitle: 'Enrolled across all courses', icon: 'GraduationCap' },
-            { id: 'stat-2', value: '45+', label: 'Academic Programs', subtitle: 'Higher Islamic curriculum', icon: 'BookOpen' },
-            { id: 'stat-3', value: '120+', label: 'Renowned Scholars', subtitle: 'Graduate faculty & researchers', icon: 'Users' },
-            { id: 'stat-4', value: '60,000+', label: 'Library Books & Manuscripts', subtitle: 'Central digital repository', icon: 'BookMarked' },
-            { id: 'stat-5', value: '99.4%', label: 'Academic Success Rate', subtitle: 'Graduates leading nationwide', icon: 'Award' }
+          const liveAdmissionStats: HeroStatItem[] = [
+            {
+              id: 'stat-apps',
+              value: formatLocalizedNumber(admissionStats.totalApplications, locale),
+              label: locale === 'bn' ? 'ভর্তি আবেদন জমা' : locale === 'ar' ? 'طلبات الالتحاق المقدمة' : 'Admission Applications',
+              subtitle: locale === 'bn' ? 'অনলাইন পোর্টালে মোট আবেদন' : locale === 'ar' ? 'إجمالي الطلبات المسجلة' : 'Total applicants registered',
+              icon: 'GraduationCap',
+              href: `/${locale}/admission`
+            },
+            {
+              id: 'stat-admitted',
+              value: formatLocalizedNumber(admissionStats.approvedAdmissions, locale),
+              label: locale === 'bn' ? 'অনুমোদিত শিক্ষার্থী' : locale === 'ar' ? 'الطلاب المقبولون' : 'Admitted Students',
+              subtitle: locale === 'bn' ? 'যাচাই ও চূড়ান্ত অনুমোদনপ্রাপ্ত' : locale === 'ar' ? 'تم اعتماد قبولهم النهائي' : 'Verified & finalized',
+              icon: 'CheckCircle2',
+              href: `/${locale}/admission`
+            },
+            {
+              id: 'stat-programs',
+              value: formatLocalizedNumber(admissionStats.totalPrograms, locale),
+              label: locale === 'bn' ? 'একাডেমিক প্রোগ্রাম' : locale === 'ar' ? 'البرامج الأكاديمية' : 'Academic Programs',
+              subtitle: locale === 'bn' ? 'উচ্চতর পাঠ্যক্রম ও কোর্স' : locale === 'ar' ? 'مناهج ودبلومات متاحة' : 'Specialized curricula',
+              icon: 'BookOpen',
+              href: `/${locale}/courses`
+            },
+            {
+              id: 'stat-scholarships',
+              value: formatLocalizedNumber(admissionStats.scholarshipApplicants, locale),
+              label: locale === 'bn' ? 'বৃত্তি ও সহায়তা আবেদন' : locale === 'ar' ? 'طلبات المنح والمساعدات' : 'Scholarship Applicants',
+              subtitle: locale === 'bn' ? 'মেধাবী ও অসচ্ছল শিক্ষার্থী' : locale === 'ar' ? 'رعاية الطلاب المستحقين' : 'Zakat & merit support',
+              icon: 'Award',
+              href: `/${locale}/admission`
+            },
+            {
+              id: 'stat-session',
+              value: locale === 'bn' ? 'উন্মুক্ত' : locale === 'ar' ? 'مفتوح' : 'Open',
+              label: locale === 'bn' ? '২০২৬-২৭ শিক্ষাবর্ষ' : locale === 'ar' ? 'العام الأكاديمي ٢٠٢٦-٢٠٢٧' : 'Academic Session 2026-27',
+              subtitle: locale === 'bn' ? 'ভর্তি আবেদন চলমান' : locale === 'ar' ? 'التسجيل متاح عبر البوابة' : 'Intake currently active',
+              icon: 'Sparkles',
+              href: `/${locale}/admission`
+            }
           ];
 
-          const statsList: HeroStatItem[] = (data?.stats && data.stats.length > 0) ? data.stats : defaultStats;
+          const statsList: HeroStatItem[] = (data?.stats && data.stats.length > 0) ? data.stats : liveAdmissionStats;
 
           return (
             <div className="mt-12 sm:mt-16 pt-8 border-t border-emerald-700/40 w-full">
               <div className="flex flex-wrap justify-center items-stretch gap-3 sm:gap-4 lg:gap-5">
-                {statsList.map((stat, idx) => (
-                  <div
-                    key={stat.id || idx}
-                    className="flex-1 min-w-[140px] max-w-[240px] sm:min-w-[170px] bg-amber-50/95 hover:bg-white border-2 border-amber-200/80 hover:border-amber-400 rounded-2xl p-4 sm:p-5 text-center shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-md flex flex-col justify-between items-center group"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100/90 border border-emerald-300/80 flex items-center justify-center text-[#064e3b] group-hover:scale-110 transition-transform mb-3 shrink-0 shadow-2xs">
-                      <RenderIcon name={stat.icon || 'Sparkles'} className="w-5 h-5 text-[#064e3b]" />
+                {statsList.map((stat, idx) => {
+                  const content = (
+                    <div
+                      key={stat.id || idx}
+                      className="flex-1 min-w-[140px] max-w-[240px] sm:min-w-[170px] bg-amber-50/95 hover:bg-white border-2 border-amber-200/80 hover:border-amber-400 rounded-2xl p-4 sm:p-5 text-center shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-md flex flex-col justify-between items-center group cursor-pointer"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100/90 border border-emerald-300/80 flex items-center justify-center text-[#064e3b] group-hover:scale-110 transition-transform mb-3 shrink-0 shadow-2xs">
+                        <RenderIcon name={stat.icon || 'Sparkles'} className="w-5 h-5 text-[#064e3b]" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-extrabold text-[#064e3b] tracking-tight font-sans">
+                          {stat.value}
+                        </div>
+                        <div className="text-xs sm:text-sm font-bold text-slate-900 mt-1 leading-snug font-serif">
+                          {stat.label}
+                        </div>
+                      </div>
+                      {stat.subtitle && (
+                        <div className="text-[10px] sm:text-[11px] text-slate-600 mt-2 line-clamp-2 leading-tight font-medium">
+                          {stat.subtitle}
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <div className="text-2xl sm:text-3xl font-extrabold text-[#064e3b] tracking-tight font-sans">
-                        {stat.value}
-                      </div>
-                      <div className="text-xs sm:text-sm font-bold text-slate-900 mt-1 leading-snug font-serif">
-                        {stat.label}
-                      </div>
-                    </div>
-                    {stat.subtitle && (
-                      <div className="text-[10px] sm:text-[11px] text-slate-600 mt-2 line-clamp-2 leading-tight font-medium">
-                        {stat.subtitle}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  );
+
+                  return stat.href ? (
+                    <Link key={stat.id || idx} href={stat.href} className="flex-1 min-w-[140px] max-w-[240px] sm:min-w-[170px] flex">
+                      {content}
+                    </Link>
+                  ) : (
+                    content
+                  );
+                })}
               </div>
             </div>
           );

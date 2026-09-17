@@ -5,7 +5,6 @@ import { getStorage } from "firebase/storage";
 
 let config: any = {};
 try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   config = require("../firebase-applet-config.json");
 } catch {
   config = {
