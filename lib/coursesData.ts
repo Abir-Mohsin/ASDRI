@@ -40,9 +40,9 @@ export interface Course {
 export const DEFAULT_COURSES: Course[] = [];
 
 export async function fetchAllCourses(): Promise<Course[]> {
-  if (typeof window !== 'undefined' || process.env.NEXT_RUNTIME === 'nodejs') {
+  if (typeof window !== 'undefined') {
     try {
-      if (db) {
+      if (db && typeof (db as any).type !== 'undefined') {
         const querySnapshot = await getDocs(collection(db, 'courses'));
         if (!querySnapshot.empty) {
           const dbCourses: Course[] = querySnapshot.docs.map(d => {
@@ -93,9 +93,9 @@ export async function fetchAllCourses(): Promise<Course[]> {
 
 export async function fetchCourseById(courseId: string): Promise<Course | null> {
   // Check Firestore first if available
-  if (typeof window !== 'undefined' || process.env.NEXT_RUNTIME === 'nodejs') {
+  if (typeof window !== 'undefined') {
     try {
-      if (db) {
+      if (db && typeof (db as any).type !== 'undefined') {
         const docRef = doc(db, 'courses', courseId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {

@@ -1,9 +1,9 @@
 import { MetadataRoute } from 'next';
-import { fetchAllCourses } from '@/lib/coursesData';
+import { COURSES } from '@/lib/constants/courses';
 
 export const dynamic = 'force-static';
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.APP_URL || 'https://asdri.edu.bd';
   const locales = ['en', 'bn', 'ar'];
   const staticRoutes = [
@@ -31,23 +31,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Add course pages
-  try {
-    const courses = await fetchAllCourses();
-    for (const locale of locales) {
-      for (const course of courses) {
-        if (course.id) {
-          sitemapEntries.push({
-            url: `${baseUrl}/${locale}/courses/${course.id}`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.7,
-          });
-        }
+  // Add course pages statically
+  for (const locale of locales) {
+    for (const course of COURSES) {
+      if (course.id) {
+        sitemapEntries.push({
+          url: `${baseUrl}/${locale}/courses/${course.id}`,
+          lastModified: new Date(),
+          changeFrequency: 'weekly',
+          priority: 0.7,
+        });
       }
     }
-  } catch (err) {
-    console.warn('Could not fetch courses for sitemap generator:', err);
   }
 
   return sitemapEntries;
