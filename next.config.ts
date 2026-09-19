@@ -41,10 +41,28 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (config, {dev}) => {
+  webpack: (config, {dev, isServer}) => {
     if (dev && process.env.DISABLE_HMR === 'true') {
       config.watchOptions = {
         ignored: /.*/,
+      };
+    }
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          ...config.optimization?.splitChunks,
+          cacheGroups: {
+            ...(config.optimization?.splitChunks?.cacheGroups || {}),
+            firebase: {
+              test: /[\\/]node_modules[\\/](@firebase|firebase)[\\/]/,
+              name: 'firebase-bundle',
+              chunks: 'all',
+              priority: 50,
+              enforce: true,
+            },
+          },
+        },
       };
     }
     return config;

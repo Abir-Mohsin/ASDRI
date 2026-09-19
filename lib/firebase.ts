@@ -2,21 +2,45 @@ import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
 import { getStorage, FirebaseStorage } from "firebase/storage";
+import "firebase/firestore";
 
-let config: any = {};
+const defaultFirebaseConfig = {
+  projectId: "asdri-fd3ec",
+  appId: "1:146467140201:web:ab60085b0a798e928c28f8",
+  apiKey: "AIzaSyBrgPOjhD98d7yVv0yPrb2wCReL3G4WxLM",
+  authDomain: "asdri-fd3ec.firebaseapp.com",
+  firestoreDatabaseId: "(default)",
+  storageBucket: "asdri-fd3ec.firebasestorage.app",
+  messagingSenderId: "146467140201",
+  measurementId: "G-F7X7GTZFRL",
+};
+
+let config: any = { ...defaultFirebaseConfig };
 try {
-  config = require("../firebase-applet-config.json");
+  const fileConfig = require("../firebase-applet-config.json");
+  if (fileConfig && fileConfig.projectId) {
+    config = { ...config, ...fileConfig };
+  }
 } catch {
-  config = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "asdri-fd3ec",
-    firestoreDatabaseId: "(default)",
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-  };
+  // If firebase-applet-config.json is absent (e.g. in local VS Code), read env or use default config
+  if (process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+    config.apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+  }
+  if (process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+    config.projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  }
+  if (process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN) {
+    config.authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN;
+  }
+  if (process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET) {
+    config.storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+  }
+  if (process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID) {
+    config.messagingSenderId = process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID;
+  }
+  if (process.env.NEXT_PUBLIC_FIREBASE_APP_ID) {
+    config.appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID;
+  }
 }
 
 if (!config.projectId) {
