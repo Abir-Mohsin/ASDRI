@@ -10,6 +10,10 @@ import { HomeFacultySpotlight } from '@/components/HomeFacultySpotlight';
 import { HomeAdmissionCta } from '@/components/HomeAdmissionCta';
 import { Footer } from '@/components/Footer';
 
+export function generateStaticParams() {
+  return [{ locale: 'en' }, { locale: 'bn' }, { locale: 'ar' }];
+}
+
 export default async function Home({
   params,
 }: {
