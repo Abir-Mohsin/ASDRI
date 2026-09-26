@@ -78,7 +78,7 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
           <div className="hidden md:flex md:items-center gap-1.5 lg:gap-3 xl:gap-4 flex-nowrap shrink-0">
             {navLinks.map((link) => {
               if (link.href === `/${locale}/about`) {
-                const isAboutActive = pathname === link.href || pathname.startsWith(`/${locale}/about`) || pathname.startsWith(`/${locale}/faculty`);
+                const isAboutActive = pathname === link.href || Boolean(pathname?.startsWith(`/${locale}/about`)) || Boolean(pathname?.startsWith(`/${locale}/faculty`));
                 return (
                   <div
                     key={link.name}
@@ -134,7 +134,7 @@ export function Navbar({ dict, locale }: { dict: any; locale: Locale }) {
               }
 
               if (link.href === `/${locale}/services`) {
-                const isServicesActive = pathname.startsWith(`/${locale}/fatwa`) || pathname.startsWith(`/${locale}/donate`) || pathname.startsWith(`/${locale}/library`) || pathname.startsWith(`/${locale}/research`) || pathname.startsWith(`/${locale}/gallery`) || pathname.startsWith(`/${locale}/alumni`);
+                const isServicesActive = Boolean(pathname?.startsWith(`/${locale}/fatwa`)) || Boolean(pathname?.startsWith(`/${locale}/donate`)) || Boolean(pathname?.startsWith(`/${locale}/library`)) || Boolean(pathname?.startsWith(`/${locale}/research`)) || Boolean(pathname?.startsWith(`/${locale}/gallery`)) || Boolean(pathname?.startsWith(`/${locale}/alumni`));
                 return (
                   <div
                     key={link.name}

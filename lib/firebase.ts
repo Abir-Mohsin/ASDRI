@@ -42,7 +42,6 @@ if (process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID) {
 
 // 2. Try loading from firebase-applet-config.json if in AI Studio container
 try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const fileConfig = require("../firebase-applet-config.json");
   if (fileConfig && fileConfig.projectId) {
     Object.assign(config, fileConfig);
