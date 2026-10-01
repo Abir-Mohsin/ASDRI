@@ -436,11 +436,17 @@ export function CourseDetailPageContent({ course, otherCourses, locale }: Course
               
               {/* Cover Image Preview */}
               <div className="w-full h-48 rounded-xl bg-slate-100 overflow-hidden relative group">
-                <img 
-                  src={coverImage} 
-                  alt={getLocalizedTitle()} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {coverImage ? (
+                  <img 
+                    src={coverImage} 
+                    alt={getLocalizedTitle()} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-emerald-950 flex items-center justify-center text-amber-300">
+                    <GraduationCap className="w-12 h-12 opacity-60" />
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded bg-[#064e3b] text-amber-300 text-[10px] font-extrabold uppercase">
                   {course.code}
@@ -574,11 +580,17 @@ export function CourseDetailPageContent({ course, otherCourses, locale }: Course
                   className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 flex flex-col overflow-hidden group"
                 >
                   <div className="w-full h-44 relative bg-slate-100 overflow-hidden shrink-0">
-                    <img 
-                      src={getCourseCoverImage(item)}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                    {getCourseCoverImage(item) ? (
+                      <img 
+                        src={getCourseCoverImage(item)}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-emerald-950 flex items-center justify-center text-amber-300">
+                        <GraduationCap className="w-10 h-10 opacity-60" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <span className="absolute bottom-2.5 left-2.5 px-2.5 py-0.5 bg-[#064e3b] text-amber-300 text-[10px] font-extrabold uppercase rounded shadow-xs">
                       {item.code}

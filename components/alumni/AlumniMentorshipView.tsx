@@ -100,11 +100,17 @@ export function AlumniMentorshipView({ alumniList, userProfile }: AlumniMentorsh
               
               {/* Mentor Photo & Header */}
               <div className="flex items-start gap-4">
-                <img
-                  src={mentor.photoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
-                  alt={mentor.fullName}
-                  className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100 shadow-xs shrink-0"
-                />
+                {Boolean(mentor.photoUrl && mentor.photoUrl.trim() !== '') ? (
+                  <img
+                    src={mentor.photoUrl.trim()}
+                    alt={mentor.fullName}
+                    className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100 shadow-xs shrink-0"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center text-emerald-800 shadow-xs shrink-0">
+                    <User className="w-8 h-8 opacity-70" />
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     {mentor.batch}
@@ -191,11 +197,17 @@ export function AlumniMentorshipView({ alumniList, userProfile }: AlumniMentorsh
             {!isSent ? (
               <form onSubmit={handleSendRequest} className="p-6 space-y-4 text-xs">
                 <div className="flex items-center gap-3 bg-emerald-50 p-3 rounded-2xl border border-emerald-200">
-                  <img
-                    src={selectedMentor.photoUrl}
-                    alt={selectedMentor.fullName}
-                    className="w-12 h-12 rounded-xl object-cover border border-emerald-300"
-                  />
+                  {Boolean(selectedMentor.photoUrl && selectedMentor.photoUrl.trim() !== '') ? (
+                    <img
+                      src={selectedMentor.photoUrl.trim()}
+                      alt={selectedMentor.fullName}
+                      className="w-12 h-12 rounded-xl object-cover border border-emerald-300"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-800 shrink-0">
+                      <User className="w-6 h-6" />
+                    </div>
+                  )}
                   <div>
                     <h4 className="font-bold text-slate-900 font-serif">{selectedMentor.fullName}</h4>
                     <p className="text-emerald-800 text-[11px] font-semibold">{selectedMentor.profession}</p>

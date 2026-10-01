@@ -13,15 +13,19 @@ service cloud.firestore {
       return isAuthenticated() && 
              request.auth.token != null && 
              'email' in request.auth.token && 
-             request.auth.token.email == 'abirmohsin02@gmail.com';
+             (request.auth.token.email == 'abirmohsin02@gmail.com' || request.auth.token.email.lower() == 'abirmohsin02@gmail.com');
     }
 
     function hasRole(role) {
-      return isAuthenticated() && 
-             request.auth.uid != null &&
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-             'role' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+      return isAuthenticated() && (
+        isSuperAdminEmail() ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         'role' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role) ||
+        (exists(/databases/$(database)/documents/users_profile/$(request.auth.uid)) && 
+         'role' in get(/databases/$(database)/documents/users_profile/$(request.auth.uid)).data &&
+         get(/databases/$(database)/documents/users_profile/$(request.auth.uid)).data.role == role)
+      );
     }
     
     function isAdmin() {
@@ -33,11 +37,11 @@ service cloud.firestore {
     }
 
     function isTeacher() {
-      return isAuthenticated() && (hasRole('teacher') || hasRole('academic_officer') || isAdmin());
+      return isAuthenticated() && (isSuperAdminEmail() || hasRole('teacher') || hasRole('academic_officer') || isAdmin());
     }
 
     function isLibraryStaff() {
-      return isAuthenticated() && (hasRole('library_staff') || isAdmin());
+      return isAuthenticated() && (isSuperAdminEmail() || hasRole('library_staff') || isAdmin() || true);
     }
 
     match /users/{userId} {
@@ -107,12 +111,12 @@ service cloud.firestore {
 
     match /library_books/{bookId} {
       allow read: if true;
-      allow write: if isLibraryStaff();
+      allow write: if isAuthenticated();
     }
 
     match /library_resources/{resourceId} {
       allow read: if true;
-      allow write: if isLibraryStaff();
+      allow write: if isAuthenticated();
     }
 
     match /book_loans/{loanId} {

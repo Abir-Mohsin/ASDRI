@@ -23,7 +23,7 @@ function toBengaliNumerals(n: number | string): string {
 }
 
 export function AdminDashboard() {
-  const { user } = useAuthStore();
+  const { user, role, isLoading: isAuthLoading } = useAuthStore();
   const params = useParams();
   const searchParams = useSearchParams();
   const locale = (params?.locale as string) || 'bn';
@@ -37,48 +37,81 @@ export function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // If authentication is still being resolved, wait before fetching
+    if (isAuthLoading) return;
+
     const fetchDashboardData = async () => {
-      try {
+      setIsLoading(true);
+
+      const hasAdminPrivilege = Boolean(user && (role === 'admin' || role === 'super_admin'));
+
+      if (hasAdminPrivilege) {
         // Fetch recent applications
-        const recentQ = query(collection(db, 'applications'), orderBy('createdAt', 'desc'), limit(5));
-        const recentSnapshot = await getDocs(recentQ);
-        if (!recentSnapshot.empty) {
-          setRecentApps(recentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        try {
+          const recentQ = query(collection(db, 'applications'), orderBy('createdAt', 'desc'), limit(5));
+          const recentSnapshot = await getDocs(recentQ);
+          if (!recentSnapshot.empty) {
+            setRecentApps(recentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+          }
+        } catch (err: any) {
+          if (err?.code === 'permission-denied') {
+            console.warn('Applications list permission check:', err.message);
+          } else {
+            console.error('Error fetching recent applications:', err);
+          }
         }
 
         // Fetch pending count
-        const pendingQ = query(collection(db, 'applications'), where('status', '==', 'pending'));
-        const pendingSnapshot = await getDocs(pendingQ);
-        if (pendingSnapshot.size > 0) {
-          setPendingCount(pendingSnapshot.size);
+        try {
+          const pendingQ = query(collection(db, 'applications'), where('status', '==', 'pending'));
+          const pendingSnapshot = await getDocs(pendingQ);
+          if (pendingSnapshot.size > 0) {
+            setPendingCount(pendingSnapshot.size);
+          }
+        } catch (err: any) {
+          if (err?.code === 'permission-denied') {
+            console.warn('Pending applications count permission check:', err.message);
+          } else {
+            console.error('Error fetching pending applications count:', err);
+          }
         }
+      }
 
-        // Try to fetch real users/students count
+      // Try to fetch real users/students count
+      try {
         const usersSnapshot = await getDocs(collection(db, 'users'));
         if (usersSnapshot.size > 0) {
           setTotalStudents(usersSnapshot.size);
         }
+      } catch {
+        // Keep default metric fallback if users collection is empty
+      }
 
-        // Try to fetch real courses count
+      // Try to fetch real courses count
+      try {
         const coursesSnapshot = await getDocs(collection(db, 'courses'));
         if (coursesSnapshot.size > 0) {
           setActiveCoursesCount(coursesSnapshot.size);
         }
+      } catch {
+        // Keep default metric fallback
+      }
 
-        // Try to fetch papers/fatwas count
+      // Try to fetch papers/fatwas count
+      try {
         const papersSnapshot = await getDocs(collection(db, 'research_papers'));
         if (papersSnapshot.size > 0) {
           setPublishedFatwasCount(papersSnapshot.size);
         }
-      } catch (error) {
-        console.error('Error fetching dashboard metrics:', error);
+      } catch {
+        // Keep default metric fallback
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, [user, role, isAuthLoading]);
 
   if (tab === 'branding') {
     return (

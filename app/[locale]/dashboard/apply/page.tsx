@@ -199,20 +199,16 @@ export default function ApplyPage() {
           };
         });
 
-        if (list.length === 0) {
-          list = COURSES;
-        } else {
-          list.sort((a, b) => {
-            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-            return dateB - dateA;
-          });
-        }
+        list.sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
 
         setDbCourses(list);
       } catch (error) {
         console.error("Error loading courses for application:", error);
-        setDbCourses(COURSES);
+        setDbCourses([]);
       } finally {
         setIsLoadingCourses(false);
       }

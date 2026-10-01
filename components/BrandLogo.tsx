@@ -68,7 +68,7 @@ export function BrandLogo({
     variant === 'footer' ? 40 : 40
   );
 
-  const hasValidImage = Boolean(branding.logoUrl && !imageError && branding.sourceType !== 'default');
+  const hasValidImage = Boolean(branding.logoUrl && typeof branding.logoUrl === 'string' && branding.logoUrl.trim() !== '' && !imageError && branding.sourceType !== 'default');
 
   // Background container styling for image or initial
   const getBackgroundClass = () => {

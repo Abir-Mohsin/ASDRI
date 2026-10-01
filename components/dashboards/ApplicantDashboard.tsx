@@ -23,6 +23,7 @@ export function ApplicantDashboard() {
 
   const [application, setApplication] = useState<any>(null);
   const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [openCourses, setOpenCourses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Modals state
@@ -256,6 +257,15 @@ export function ApplicantDashboard() {
       if (!snapshotEnr.empty) {
         setEnrollments(snapshotEnr.docs.map(d => ({ id: d.id, ...d.data() })));
       }
+
+      // 3. Fetch active courses from Firestore
+      const qCourses = collection(db, 'courses');
+      const snapCourses = await getDocs(qCourses);
+      if (!snapCourses.empty) {
+        setOpenCourses(snapCourses.docs.map(d => ({ id: d.id, ...d.data() })));
+      } else {
+        setOpenCourses([]);
+      }
     } catch (error) {
       console.error('Error fetching applicant data:', error);
     } finally {
@@ -286,8 +296,32 @@ export function ApplicantDashboard() {
   }
 
   const enrolledCourseId = application?.courseId || enrollments[0]?.courseId;
-  const rawMatchedCourse = COURSES.find(c => c.id === enrolledCourseId) || COURSES[0];
-  const matchedCourse = getLocalizedCourse(rawMatchedCourse, locale);
+  const rawMatchedCourse = openCourses.find(c => c.id === enrolledCourseId);
+  const matchedCourse = rawMatchedCourse 
+    ? {
+        title: (locale === 'bn' && rawMatchedCourse.titleBn) ? rawMatchedCourse.titleBn : (locale === 'ar' && rawMatchedCourse.titleAr) ? rawMatchedCourse.titleAr : rawMatchedCourse.title,
+        duration: rawMatchedCourse.duration || '1 Year',
+        type: rawMatchedCourse.type || 'Academic Track',
+        fees: rawMatchedCourse.fees || {
+          admissionFee: 1000,
+          tuitionFee: 5000,
+          accommodationFee: 0,
+          totalFee: 6000,
+          isFree: false
+        }
+      }
+    : {
+        title: application?.courseTitle || application?.courseId || 'Academic Program',
+        duration: '1 Year',
+        type: 'Academic Track',
+        fees: application?.fees || {
+          admissionFee: 1000,
+          tuitionFee: 5000,
+          accommodationFee: 0,
+          totalFee: 6000,
+          isFree: false
+        }
+      };
 
   const handlePayFeeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -497,50 +531,71 @@ export function ApplicantDashboard() {
               <BookOpen className="w-5 h-5 text-emerald-700" />
               {t('availablePrograms')}
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {COURSES.map((rawCourse) => {
-                const course = getLocalizedCourse(rawCourse, locale);
-                return (
-                  <div key={course.id} className="border border-slate-200/90 hover:border-emerald-600 rounded-2xl p-5 transition-all group flex flex-col justify-between bg-white hover:shadow-sm">
-                    <div>
-                      <div className="flex justify-between items-start mb-2.5">
-                        <div className="p-2 rounded-xl bg-emerald-50 text-emerald-800 group-hover:scale-105 transition-transform">
-                          <BookOpen className="w-5 h-5" />
+            {openCourses.length === 0 ? (
+              <div className="text-center py-10 px-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                <BookOpen className="w-10 h-10 text-slate-300 mx-auto mb-2.5" />
+                <p className="text-xs sm:text-sm font-medium text-slate-600">
+                  {locale === 'bn' 
+                    ? 'বর্তমানে নতুন কোনো কোর্স বা ব্যাচ উন্মুক্ত নেই।' 
+                    : locale === 'ar' 
+                    ? 'لا توجد برامج أو دفعات دراسية مفتوحة للتقديم حالياً.' 
+                    : 'No academic courses are open for application at this moment.'}
+                </p>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  {locale === 'bn'
+                    ? 'এডমিন প্যানেল থেকে নতুন একাডেমিক কোর্স অনুমোদিত হলে এখানে প্রকাশিত হবে।'
+                    : locale === 'ar'
+                    ? 'سيتم إعلان المقررات الجديدة عند اعتمادها من الإدارة الأكاديمية.'
+                    : 'New programs will appear here once published by the academic office.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {openCourses.map((course) => {
+                  const courseTitle = (locale === 'bn' && course.titleBn) ? course.titleBn : (locale === 'ar' && course.titleAr) ? course.titleAr : (course.title || 'Course');
+                  const courseFees = course.fees || { isFree: true, totalFee: 0 };
+                  return (
+                    <div key={course.id} className="border border-slate-200/90 hover:border-emerald-600 rounded-2xl p-5 transition-all group flex flex-col justify-between bg-white hover:shadow-sm">
+                      <div>
+                        <div className="flex justify-between items-start mb-2.5">
+                          <div className="p-2 rounded-xl bg-emerald-50 text-emerald-800 group-hover:scale-105 transition-transform">
+                            <BookOpen className="w-5 h-5" />
+                          </div>
+                          {courseFees.isFree ? (
+                            <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full">
+                              {t('freeBadge')}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 rounded-full font-mono">
+                              {t('feePrefix')}{courseFees.totalFee}
+                            </span>
+                          )}
                         </div>
-                        {course.fees.isFree ? (
-                          <span className="text-[10px] font-extrabold bg-emerald-100 text-emerald-900 px-2.5 py-0.5 rounded-full">
-                            {t('freeBadge')}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-200 px-2.5 py-0.5 rounded-full font-mono">
-                            {t('feePrefix')}{course.fees.totalFee}
-                          </span>
+                        <h4 className="font-bold text-sm text-slate-900 leading-snug group-hover:text-emerald-900 transition-colors">
+                          {courseTitle}
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-2 font-medium">
+                          {course.duration || '1 Year'} • {course.type || 'Academic Track'}
+                        </p>
+                        {courseFees.notes && (
+                          <p className="text-[11px] text-slate-400 mt-1.5 italic line-clamp-2 leading-relaxed">
+                            {courseFees.notes}
+                          </p>
                         )}
                       </div>
-                      <h4 className="font-bold text-sm text-slate-900 leading-snug group-hover:text-emerald-900 transition-colors">
-                        {course.title}
-                      </h4>
-                      <p className="text-xs text-slate-500 mt-2 font-medium">
-                        {course.duration} • {course.type}
-                      </p>
-                      {course.fees.notes && (
-                        <p className="text-[11px] text-slate-400 mt-1.5 italic line-clamp-2 leading-relaxed">
-                          {course.fees.notes}
-                        </p>
-                      )}
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
+                        <Link 
+                          href={`/${locale}/dashboard/apply?course=${course.id}`} 
+                          className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
+                        >
+                          {t('applyNowBtn')}
+                        </Link>
+                      </div>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
-                      <Link 
-                        href={`/${locale}/dashboard/apply?course=${course.id}`} 
-                        className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
-                      >
-                        {t('applyNowBtn')}
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 

@@ -52,149 +52,9 @@ export interface GalleryPageData {
   updatedAt?: string;
 }
 
-const DEFAULT_PHOTOS: GalleryPhotoItem[] = [
-  {
-    id: 'p1',
-    title: 'ইনস্টিটিউট কেন্দ্রীয় ক্যাম্পাস ও সুদৃঢ় স্থাপত্য',
-    category: 'campus',
-    date: 'জানুয়ারি ২০২৬',
-    location: 'সাতারকুল ক্যাম্পাস, ঢাকা',
-    image: 'https://images.unsplash.com/photo-1542816417-0983cbe33577?auto=format&fit=crop&w=1200&q=80',
-    description: 'প্রশান্ত ও দ্বীনি পরিবেশে পাঠদানের আধুনিক স্থাপত্য সম্বলিত কেন্দ্রীয় ক্যাম্পাস ভবন ও সম্মুখ চত্বর।'
-  },
-  {
-    id: 'p2',
-    title: 'আন্তর্জাতিক হাদিস ও সমকালীন গবেষণা কনফারেন্স',
-    category: 'seminar',
-    date: 'ডিসেম্বর ২০২৫',
-    location: 'অডিটোরিয়াম হল',
-    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80',
-    description: 'দেশ-বিদেশের প্রখ্যাত স্কলার ও মুহাদ্দিসগণের উপস্থিতিতে আন্তর্জাতিক ইসলামিক রিসার্চ সামিট।'
-  },
-  {
-    id: 'p3',
-    title: 'বার্ষিক সমাবর্তন ও দস্তারবন্দী মহোৎসব',
-    category: 'convocation',
-    date: 'নভেম্বর ২০২৫',
-    location: 'প্রধান কনভেনশন হল',
-    image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1200&q=80',
-    description: 'উচ্চতর হাদিস ও ফিকহ বিভাগের উত্তীর্ণ স্কলারদের মাঝে সম্মানজনক সনদ ও দস্তার প্রদান।'
-  },
-  {
-    id: 'p4',
-    title: 'জাতীয় আজান প্রশিক্ষণ ও সুর অনুশীলন কর্মশালা',
-    category: 'competition',
-    date: 'ফেব্রুয়ারি ২০২৬',
-    location: 'আজান প্রশিক্ষণ ল্যাব',
-    image: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=1200&q=80',
-    description: 'হারামাইন শরীফাইনের সুর ও মাখরাজের বিশুদ্ধতায় মুয়াযযিনদের সুর সাধনার বিশেষ সেশন।'
-  },
-  {
-    id: 'p5',
-    title: 'কেন্দ্রীয় ডিজিটাল লাইব্রেরি ও স্টাডি কর্নার',
-    category: 'library',
-    date: 'চলমান সেশন',
-    location: 'লাইব্রেরি ভবন, ২য় তলা',
-    image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80',
-    description: 'হাজারো দুর্লভ পাণ্ডুলিপি ও ই-বুক সমৃদ্ধ গবেষক ও শিক্ষার্থীদের আধুনিক রিডিং হল।'
-  },
-  {
-    id: 'p6',
-    title: 'উচ্চতর ফিকহ ও ফতোয়া গবেষণা ডেস্ক',
-    category: 'library',
-    date: 'অক্টোবর ২০২৫',
-    location: 'রিসার্চ উইং',
-    image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=1200&q=80',
-    description: 'সমকালীন অর্থনৈতিক ও পারিবারিক মাসআলার গবেষণায় নিয়োজিত গবেষক আলেম প্যানেল।'
-  },
-  {
-    id: 'p7',
-    title: 'কুরআনুল কারীম হিফজ ও শুদ্ধ তাজবীদ মজলিস',
-    category: 'competition',
-    date: 'জানুয়ারি ২০২৬',
-    location: 'কেন্দ্রীয় মসজিদ হল',
-    image: 'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&fit=crop&w=1200&q=80',
-    description: 'আন্তর্জাতিক মানের ক্বারীগণের তত্ত্বাবধানে তাজবীদ ও লাহনের নিবিড় অনুশীলন।'
-  },
-  {
-    id: 'p8',
-    title: 'বিদেশি অতিথি স্কলারদের সৌজন্য সাক্ষাৎ ও মতবিনিময়',
-    category: 'seminar',
-    date: 'নভেম্বর ২০২৫',
-    location: 'ভিআইপি কনফারেন্স রুম',
-    image: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80',
-    description: 'মদীনা ও আল-আজহার বিশ্ববিদ্যালয়ের প্রতিনিধি দলের সাথে দ্বিপাক্ষিক একাডেমিক বৈঠক।'
-  }
-];
-
-const DEFAULT_VIDEOS: GalleryVideoItem[] = [
-  {
-    id: 'v1',
-    title: 'আস-সুন্নাহ দাওয়াহ অ্যান্ড রিসার্চ ইনস্টিটিউট পরিচিতি ও ক্যাম্পাস ট্যুর',
-    category: 'campus',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail: 'https://images.unsplash.com/photo-1542816417-0983cbe33577?auto=format&fit=crop&w=1200&q=80',
-    duration: '০৬:২০ মিনিট',
-    speaker: 'ইনস্টিটিউট মিডিয়া সেল',
-    date: 'জানুয়ারি ২০২৬',
-    description: 'ইনস্টিটিউটের আধুনিক অবকাঠামো, শ্রেণীকক্ষ, লাইব্রেরি ও আবাসিক পরিবেশের পূর্ণাঙ্গ ভিডিও তথ্যচিত্র।'
-  },
-  {
-    id: 'v2',
-    title: 'আন্তর্জাতিক হাদিস গবেষণা সম্মেলন ও স্কলারদের দিকনির্দেশনা',
-    category: 'seminar',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80',
-    duration: '২৫:৪০ মিনিট',
-    speaker: 'ড. শায়খ গবেষক পরিষদ',
-    date: 'ডিসেম্বর ২০২৫',
-    description: 'সমকালীন হাদিস গবেষণা ও তাকহাসসুস প্রোগ্রামের গুরুত্ব নিয়ে স্কলারদের বিশেষ ভাষণ।'
-  },
-  {
-    id: 'v3',
-    title: 'প্রথম ব্যাচ বার্ষিক সমাবর্তন ও দস্তারবন্দী মহোৎসব',
-    category: 'convocation',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1200&q=80',
-    duration: '১৪:৩০ মিনিট',
-    speaker: 'সম্মানিত অতিথি ও ট্রাস্টি বোর্ড',
-    date: 'নভেম্বর ২০২৫',
-    description: 'উত্তীর্ণ গবেষক ও আলেমদের দস্তার প্রদান ও আনন্দঘন সমাবর্তন পর্বের বিশেষ মুহূর্ত।'
-  },
-  {
-    id: 'v4',
-    title: 'হারামাইন শরীফাইনের সুরে শুদ্ধ আজান প্রশিক্ষণ কর্মশালা',
-    category: 'competition',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=1200&q=80',
-    duration: '০৯:১৫ মিনিট',
-    speaker: 'প্রধান ক্বারী ও মুয়াযযিন',
-    date: 'ফেব্রুয়ারি ২০২৬',
-    description: 'আজানের সুর, লয় এবং সহীহ মাখরাজ অনুশীলনের ব্যবহারিক ক্লাস ও শিক্ষার্থীদের পরিবেশনা।'
-  },
-  {
-    id: 'v5',
-    title: '৬০,০০০+ কিতাবের মেগা ডিজিটাল লাইব্রেরি ও ক্লাউড অ্যাক্সেস গাইড',
-    category: 'library',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80',
-    duration: '০৭:৫০ মিনিট',
-    speaker: 'ডিজিটাল লাইব্রেরি টিম',
-    date: 'চলমান সেশন',
-    description: 'গুগল ড্রাইভ ও ওয়ানড্রাইভ থেকে সহস্রাধিক দুর্লভ আরবি কিতাব খোঁজা ও অধ্যয়নের নিয়ম।'
-  },
-  {
-    id: 'v6',
-    title: 'সমকালীন ইসলামিক অর্থনীতি ও ফিকহুল মুআমালাত সিম্পোজিয়াম',
-    category: 'seminar',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=1200&q=80',
-    duration: '১৮:০০ মিনিট',
-    speaker: 'মুফতি পরিষদ ও অর্থনীতিবিদ',
-    date: 'অক্টোবর ২০২৫',
-    description: 'আধুনিক ব্যবসা-বাণিজ্য ও ফিন্যান্সে ইসলামী অনুশাসন প্রয়োগের দিকনির্দেশনা।'
-  }
-];
+// Zero dummy photos or videos: real media is published from admin panel
+const DEFAULT_PHOTOS: GalleryPhotoItem[] = [];
+const DEFAULT_VIDEOS: GalleryVideoItem[] = [];
 
 const CATEGORIES_LIST = [
   'all',
@@ -396,7 +256,7 @@ export function GalleryPageContent({ locale }: { locale: 'en' | 'bn' | 'ar' }) {
 
   const pageTitle = data?.title || t.defaultTitle;
   const pageSubtitle = data?.subtitle || t.defaultSubtitle;
-  const bannerImageUrl = data?.bannerImageUrl || 'https://images.unsplash.com/photo-1542816417-0983cbe33577?auto=format&fit=crop&w=1600&q=80';
+  const bannerImageUrl = data?.bannerImageUrl || '';
   const heroVideoUrl = data?.heroVideoUrl || '';
   const heroMediaType = data?.heroMediaType || 'image';
 
@@ -545,15 +405,15 @@ export function GalleryPageContent({ locale }: { locale: 'en' | 'bn' | 'ar' }) {
       {/* 1. HERO SECTION */}
       <section className="relative bg-[#042f24] text-white py-16 md:py-24 overflow-hidden border-b border-emerald-900/50 shadow-md">
         {/* Background Image / Texture */}
-        {bannerImageUrl && heroMediaType === 'image' && (
+        {Boolean(bannerImageUrl && bannerImageUrl.trim() !== '') && heroMediaType === 'image' ? (
           <div className="absolute inset-0 opacity-20">
             <img 
-              src={bannerImageUrl} 
+              src={bannerImageUrl.trim()} 
               alt={pageTitle}
               className="w-full h-full object-cover scale-105 filter blur-[1px]" 
             />
           </div>
-        )}
+        ) : null}
         <div className="absolute inset-0 bg-gradient-to-t from-[#042f24] via-[#064e3b]/80 to-transparent"></div>
         <div className="absolute inset-0 opacity-10 bg-arabesque-pattern pointer-events-none"></div>
 
@@ -645,67 +505,78 @@ export function GalleryPageContent({ locale }: { locale: 'en' | 'bn' | 'ar' }) {
           </div>
 
           {/* Continuous Right-to-Left Photo Marquee */}
-          <div className="relative w-full overflow-hidden py-3 group">
-            {/* Edge Shadow Overlays */}
-            <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
-
-            {/* Marquee Track (Duplicated for seamless continuous infinite right-to-left sliding) */}
-            <div className="animate-marquee-rtl flex items-center gap-5">
-              {[...photosList, ...photosList].map((photo, idx) => (
-                <div
-                  key={`photo_track_${idx}`}
-                  onClick={() => handleOpenPhoto(photo)}
-                  className="w-[290px] sm:w-[340px] shrink-0 bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xl hover:border-emerald-300 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col group/card"
-                >
-                  <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-900">
-                    <img 
-                      src={photo.image} 
-                      alt={photo.title}
-                      className="w-full h-full object-cover group-hover/card:scale-108 transition-transform duration-500" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover/card:opacity-90 transition-opacity"></div>
-                    
-                    {/* Category Badge */}
-                    <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/60 backdrop-blur-xs border border-white/20 text-white rounded-full text-[10px] font-bold">
-                      {getCategoryName(photo.category)}
-                    </div>
-
-                    {/* View Button Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all duration-300 scale-90 group-hover/card:scale-100">
-                      <div className="px-3.5 py-1.5 bg-emerald-700/90 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg backdrop-blur-xs">
-                        <Eye className="w-4 h-4 text-amber-300" />
-                        <span>{t.viewFullPhoto}</span>
-                      </div>
-                    </div>
-
-                    {/* Location Badge */}
-                    {photo.location && (
-                      <div className="absolute bottom-3 left-3 text-[10px] text-emerald-200 flex items-center gap-1 font-medium truncate max-w-[90%]">
-                        <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
-                        <span className="truncate">{photo.location}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-4 space-y-1.5 flex-1 flex flex-col justify-between">
-                    <h3 className="text-xs sm:text-sm font-bold text-slate-800 group-hover/card:text-[#064e3b] transition-colors line-clamp-2">
-                      {photo.title}
-                    </h3>
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-amber-600" />
-                        {photo.date || ''}
-                      </span>
-                      <span className="text-emerald-700 font-bold group-hover/card:underline flex items-center gap-0.5">
-                        {t.details} <ArrowUpRight className="w-3 h-3" />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          {photosList.length === 0 ? (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              <div className="p-8 text-center bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                <ImageIcon className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                  {locale === 'bn' ? 'গ্যালারিতে এখনো কোনো ছবি যুক্ত করা হয়নি।' : 'No photos added to gallery yet.'}
+                </p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="relative w-full overflow-hidden py-3 group">
+              {/* Edge Shadow Overlays */}
+              <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
+
+              {/* Marquee Track (Duplicated for seamless continuous infinite right-to-left sliding) */}
+              <div className="animate-marquee-rtl flex items-center gap-5">
+                {[...photosList, ...photosList].map((photo, idx) => (
+                  <div
+                    key={`photo_track_${idx}`}
+                    onClick={() => handleOpenPhoto(photo)}
+                    className="w-[290px] sm:w-[340px] shrink-0 bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xl hover:border-emerald-300 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col group/card"
+                  >
+                    <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-900">
+                      <img 
+                        src={photo.image || "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=1000&q=80"} 
+                        alt={photo.title}
+                        className="w-full h-full object-cover group-hover/card:scale-108 transition-transform duration-500" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover/card:opacity-90 transition-opacity"></div>
+                      
+                      {/* Category Badge */}
+                      <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/60 backdrop-blur-xs border border-white/20 text-white rounded-full text-[10px] font-bold">
+                        {getCategoryName(photo.category)}
+                      </div>
+
+                      {/* View Button Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all duration-300 scale-90 group-hover/card:scale-100">
+                        <div className="px-3.5 py-1.5 bg-emerald-700/90 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg backdrop-blur-xs">
+                          <Eye className="w-4 h-4 text-amber-300" />
+                          <span>{t.viewFullPhoto}</span>
+                        </div>
+                      </div>
+
+                      {/* Location Badge */}
+                      {photo.location && (
+                        <div className="absolute bottom-3 left-3 text-[10px] text-emerald-200 flex items-center gap-1 font-medium truncate max-w-[90%]">
+                          <MapPin className="w-3 h-3 text-amber-400 shrink-0" />
+                          <span className="truncate">{photo.location}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-4 space-y-1.5 flex-1 flex flex-col justify-between">
+                      <h3 className="text-xs sm:text-sm font-bold text-slate-800 group-hover/card:text-[#064e3b] transition-colors line-clamp-2">
+                        {photo.title}
+                      </h3>
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-amber-600" />
+                          {photo.date || ''}
+                        </span>
+                        <span className="text-emerald-700 font-bold group-hover/card:underline flex items-center gap-0.5">
+                          {t.details} <ArrowUpRight className="w-3 h-3" />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ROW 2: VIDEOS SECTION WITH RIGHT-TO-LEFT SMOOTH SCROLL */}
@@ -735,80 +606,91 @@ export function GalleryPageContent({ locale }: { locale: 'en' | 'bn' | 'ar' }) {
           </div>
 
           {/* Continuous Right-to-Left Video Marquee */}
-          <div className="relative w-full overflow-hidden py-3 group">
-            {/* Edge Shadow Overlays */}
-            <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
-
-            {/* Marquee Track (Duplicated for seamless continuous infinite right-to-left sliding) */}
-            <div className="animate-marquee-rtl-slow flex items-center gap-5">
-              {[...videosList, ...videosList].map((video, idx) => {
-                const parsed = parseVideoUrl(video.videoUrl, video.thumbnail);
-                const thumb = video.thumbnail || parsed.thumbnailUrl;
-
-                return (
-                  <div
-                    key={`video_track_${idx}`}
-                    onClick={() => handleOpenVideo(video)}
-                    className="w-[290px] sm:w-[340px] shrink-0 bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xl hover:border-rose-300 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col group/vcard"
-                  >
-                    <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-950">
-                      <img 
-                        src={thumb} 
-                        alt={video.title}
-                        className="w-full h-full object-cover opacity-85 group-hover/vcard:scale-108 group-hover/vcard:opacity-95 transition-all duration-500" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
-                      
-                      {/* Play Button Overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-12 h-12 rounded-full bg-rose-600/90 group-hover/vcard:bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover/vcard:scale-110 transition-transform duration-300 backdrop-blur-2xs border border-white/30">
-                          <Play className="w-5 h-5 fill-white ml-0.5" />
-                        </div>
-                      </div>
-
-                      {/* Duration Badge */}
-                      {video.duration && (
-                        <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/80 backdrop-blur-xs text-white rounded text-[10px] font-mono font-bold flex items-center gap-1 border border-white/10">
-                          <Clock className="w-2.5 h-2.5 text-rose-400" />
-                          <span>{video.duration}</span>
-                        </div>
-                      )}
-
-                      {/* Category Badge */}
-                      <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/70 backdrop-blur-xs border border-white/20 text-rose-200 rounded-full text-[10px] font-bold">
-                        {getCategoryName(video.category)}
-                      </div>
-                    </div>
-
-                    <div className="p-4 space-y-1.5 flex-1 flex flex-col justify-between">
-                      <div>
-                        <h3 className="text-xs sm:text-sm font-bold text-slate-800 group-hover/vcard:text-rose-700 transition-colors line-clamp-2">
-                          {video.title}
-                        </h3>
-                        {video.speaker && (
-                          <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
-                            <User className="w-3 h-3 text-slate-400" />
-                            <span>{video.speaker}</span>
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-slate-400" />
-                          {video.date || ''}
-                        </span>
-                        <span className="text-rose-600 font-bold group-hover/vcard:underline flex items-center gap-0.5">
-                          {t.playVideo} <Play className="w-2.5 h-2.5 fill-rose-600" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+          {videosList.length === 0 ? (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              <div className="p-8 text-center bg-white rounded-2xl border border-slate-200 shadow-2xs">
+                <Video className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                  {locale === 'bn' ? 'ভিডিও আর্কাইভে এখনো কোনো ভিডিও আপলোড করা হয়নি।' : 'No video documentaries published yet.'}
+                </p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="relative w-full overflow-hidden py-3 group">
+              {/* Edge Shadow Overlays */}
+              <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
+              <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
+
+              {/* Marquee Track (Duplicated for seamless continuous infinite right-to-left sliding) */}
+              <div className="animate-marquee-rtl-slow flex items-center gap-5">
+                {[...videosList, ...videosList].map((video, idx) => {
+                  const parsed = parseVideoUrl(video.videoUrl, video.thumbnail);
+                  const thumb = video.thumbnail || parsed.thumbnailUrl;
+
+                  return (
+                    <div
+                      key={`video_track_${idx}`}
+                      onClick={() => handleOpenVideo(video)}
+                      className="w-[290px] sm:w-[340px] shrink-0 bg-white rounded-2xl border border-slate-200/90 shadow-2xs hover:shadow-xl hover:border-rose-300 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col group/vcard"
+                    >
+                      <div className="relative h-48 sm:h-52 overflow-hidden bg-slate-950">
+                        <img 
+                          src={thumb || "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=1000&q=80"} 
+                          alt={video.title}
+                          className="w-full h-full object-cover opacity-85 group-hover/vcard:scale-108 group-hover/vcard:opacity-95 transition-all duration-500" 
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+                        
+                        {/* Play Button Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-full bg-rose-600/90 group-hover/vcard:bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover/vcard:scale-110 transition-transform duration-300 backdrop-blur-2xs border border-white/30">
+                            <Play className="w-5 h-5 fill-white ml-0.5" />
+                          </div>
+                        </div>
+
+                        {/* Duration Badge */}
+                        {video.duration && (
+                          <div className="absolute bottom-3 right-3 px-2 py-0.5 bg-black/80 backdrop-blur-xs text-white rounded text-[10px] font-mono font-bold flex items-center gap-1 border border-white/10">
+                            <Clock className="w-2.5 h-2.5 text-rose-400" />
+                            <span>{video.duration}</span>
+                          </div>
+                        )}
+
+                        {/* Category Badge */}
+                        <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/70 backdrop-blur-xs border border-white/20 text-rose-200 rounded-full text-[10px] font-bold">
+                          {getCategoryName(video.category)}
+                        </div>
+                      </div>
+
+                      <div className="p-4 space-y-1.5 flex-1 flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-xs sm:text-sm font-bold text-slate-800 group-hover/vcard:text-rose-700 transition-colors line-clamp-2">
+                            {video.title}
+                          </h3>
+                          {video.speaker && (
+                            <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+                              <User className="w-3 h-3 text-slate-400" />
+                              <span>{video.speaker}</span>
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3 text-slate-400" />
+                            {video.date || ''}
+                          </span>
+                          <span className="text-rose-600 font-bold group-hover/vcard:underline flex items-center gap-0.5">
+                            {t.playVideo} <Play className="w-2.5 h-2.5 fill-rose-600" />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
       </section>
@@ -964,7 +846,7 @@ export function GalleryPageContent({ locale }: { locale: 'en' | 'bn' | 'ar' }) {
                     >
                       <div className="relative h-56 overflow-hidden bg-slate-900">
                         <img 
-                          src={photo.image} 
+                          src={photo.image || "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=1000&q=80"} 
                           alt={photo.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                         />
@@ -1027,7 +909,7 @@ export function GalleryPageContent({ locale }: { locale: 'en' | 'bn' | 'ar' }) {
                     >
                       <div className="relative h-56 overflow-hidden bg-slate-950">
                         <img 
-                          src={thumb} 
+                          src={thumb || "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=1000&q=80"} 
                           alt={video.title}
                           className="w-full h-full object-cover opacity-85 group-hover:scale-105 group-hover:opacity-95 transition-all duration-500" 
                         />
@@ -1198,7 +1080,7 @@ export function GalleryPageContent({ locale }: { locale: 'en' | 'bn' | 'ar' }) {
             {/* Image Viewer Area with Navigation Arrows */}
             <div className="relative flex-1 bg-black flex items-center justify-center min-h-[280px] sm:min-h-[420px] max-h-[60vh] overflow-hidden group/modal">
               <img 
-                src={selectedPhoto.image} 
+                src={selectedPhoto.image || "https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=1000&q=80"} 
                 alt={selectedPhoto.title}
                 className="max-h-full max-w-full object-contain" 
               />
@@ -1317,14 +1199,22 @@ export function GalleryPageContent({ locale }: { locale: 'en' | 'bn' | 'ar' }) {
                     />
                   );
                 }
-                return (
-                  <iframe
-                    src={parsed.embedUrl}
+                if (parsed.embedUrl) {
+                  return (
+                    <iframe
+                      src={parsed.embedUrl}
                     title={selectedVideo.title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     className="w-full h-full border-0"
-                  />
+                    />
+                  );
+                }
+                return (
+                  <div className="flex flex-col items-center justify-center p-8 text-center text-slate-400 h-full">
+                    <Video className="w-12 h-12 text-slate-600 mb-2" />
+                    <p className="text-sm font-semibold">Video preview unavailable</p>
+                  </div>
                 );
               })()}
             </div>

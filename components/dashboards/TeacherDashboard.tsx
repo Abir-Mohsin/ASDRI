@@ -1172,19 +1172,19 @@ export function TeacherDashboard() {
                               </div>
 
                               {/* Inline players based on attachment types */}
-                              {att.type === 'audio' && (
+                              {att.type === 'audio' && att.url && (
                                 <div className="mt-1">
                                   <audio src={att.url} controls className="w-full h-8 text-xs bg-transparent" />
                                 </div>
                               )}
 
-                              {att.type === 'video' && (
+                              {att.type === 'video' && att.url && (
                                 <div className="mt-1 rounded overflow-hidden bg-black border border-slate-200">
                                   <video src={att.url} controls className="w-full max-h-[140px] object-contain" />
                                 </div>
                               )}
 
-                              {att.type === 'image' && (
+                              {att.type === 'image' && att.url && (
                                 <div className="mt-1 rounded overflow-hidden border border-slate-200 max-h-[140px] bg-slate-100 flex items-center justify-center">
                                   <img src={att.url} alt={att.name} className="max-h-[140px] object-contain" referrerPolicy="no-referrer" />
                                 </div>

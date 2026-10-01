@@ -29,7 +29,7 @@ export function DynamicPageRenderer({
   pageId,
   fallbackTitle,
   fallbackSubtitle,
-  fallbackBannerUrl = 'https://images.unsplash.com/photo-1542816417-0983cbe33577?auto=format&fit=crop&w=1200&q=80',
+  fallbackBannerUrl = '',
   fallbackContent,
   locale = 'bn',
   children
@@ -77,17 +77,17 @@ export function DynamicPageRenderer({
     <div>
       {/* Hero Header */}
       <div className="bg-[#064e3b] text-white py-16 md:py-20 relative overflow-hidden">
-        {bannerImageUrl && (
+        {Boolean(bannerImageUrl && bannerImageUrl.trim() !== '') ? (
           <div className="absolute inset-0 opacity-25">
             <img 
-              src={bannerImageUrl} 
+              src={bannerImageUrl.trim()} 
               alt="" 
               referrerPolicy="no-referrer"
               onError={() => setImageError(true)}
               className="w-full h-full object-cover" 
             />
           </div>
-        )}
+        ) : null}
         <div className="absolute inset-0 opacity-10 bg-arabesque-pattern pointer-events-none"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4 font-serif text-amber-300">

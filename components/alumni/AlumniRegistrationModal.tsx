@@ -28,7 +28,7 @@ export function AlumniRegistrationModal({ isOpen, onClose, onSuccess }: AlumniRe
   // Form State
   const [formData, setFormData] = useState({
     fullName: '',
-    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    photoUrl: '',
     studentId: '',
     program: ALUMNI_PROGRAMS[0],
     batch: ALUMNI_BATCHES[ALUMNI_BATCHES.length - 1],
@@ -81,7 +81,7 @@ export function AlumniRegistrationModal({ isOpen, onClose, onSuccess }: AlumniRe
 
       const payload = {
         fullName: formData.fullName,
-        photoUrl: formData.photoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+        photoUrl: formData.photoUrl || '',
         alumniId: newAlumniId,
         studentId: formData.studentId || `ST-${formData.graduationYear}-${count}`,
         program: formData.program,

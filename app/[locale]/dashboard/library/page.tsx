@@ -11,7 +11,7 @@ import { useParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { 
   collection, query, onSnapshot, addDoc, doc, 
-  updateDoc, deleteDoc, setDoc 
+  updateDoc, deleteDoc, setDoc, getDocs, writeBatch 
 } from 'firebase/firestore';
 import { BookReaderModal } from '@/components/BookReaderModal';
 import { LibraryBook, getBookEmbedUrl, getBookDownloadUrl } from '@/lib/libraryBooksData';
@@ -54,64 +54,8 @@ export default function LibraryPage() {
   );
   const categories = ['All', ...allExistingCategories];
 
-  // Default initial mock resources
-  const defaultMockResources = [
-    {
-      id: 'book1',
-      title: 'Al-Aqeedah Al-Tahawiyyah',
-      author: 'Imam Abu Jafar al-Tahawi',
-      category: 'Aqeedah',
-      type: 'PDF',
-      size: '2.4 MB',
-      reads: 1240,
-      language: 'Arabic/English',
-      driveUrl: 'https://archive.org/details/Sharh-Aqeedah-Tahawiyyah-Bangla',
-    },
-    {
-      id: 'book2',
-      title: 'Mukhtasar al-Quduri',
-      author: 'Imam al-Quduri',
-      category: 'Fiqh',
-      type: 'PDF',
-      size: '5.1 MB',
-      reads: 890,
-      language: 'Arabic',
-      driveUrl: 'https://archive.org/details/Al-Hidayah-Bangla-Full',
-    },
-    {
-      id: 'book3',
-      title: 'Introduction to Usul al-Fiqh',
-      author: 'Dr. Hashim Kamali',
-      category: 'Fiqh',
-      type: 'E-Book',
-      size: '1.2 MB',
-      reads: 3450,
-      language: 'English',
-      driveUrl: 'https://archive.org/details/Itqan-Fi-Ulum-Al-Quran',
-    },
-    {
-      id: 'paper1',
-      title: 'Modern Dawah Challenges in the West',
-      author: 'ASDRI Research Wing',
-      category: 'Research Papers',
-      type: 'Document',
-      size: '800 KB',
-      reads: 430,
-      language: 'English',
-      driveUrl: 'https://archive.org/details/ModernDawah',
-    },
-    {
-      id: 'book4',
-      title: 'Tafseer Ibn Kathir (Vol 1)',
-      author: 'Imam Ibn Kathir',
-      category: 'Tafseer',
-      type: 'PDF',
-      size: '15 MB',
-      reads: 5600,
-      language: 'Arabic/Bengali',
-      driveUrl: 'https://archive.org/details/Tafseer-Ibn-Katheer-Bengali',
-    }
-  ];
+  // Default initial mock resources (Zero dummy data)
+  const defaultMockResources: any[] = [];
 
   // Fetch from Firestore
   useEffect(() => {
@@ -127,33 +71,6 @@ export default function LibraryPage() {
     });
     return () => unsubscribe();
   }, []);
-
-  // Sync / Seed Default Resources to Firestore if empty
-  const handleSeedResources = async () => {
-    if (!db || isSeeding) return;
-    setIsSeeding(true);
-    try {
-      for (const res of defaultMockResources) {
-        await setDoc(doc(db, 'library_resources', res.id), {
-          title: res.title,
-          author: res.author,
-          category: res.category,
-          type: res.type,
-          size: res.size,
-          reads: res.reads,
-          language: res.language,
-          driveUrl: res.driveUrl,
-          createdAt: new Date().toISOString()
-        });
-      }
-      alert(locale === 'en' ? 'Digital Library resources seeded successfully!' : 'ডিজিটাল লাইব্রেরি রিসোর্স সফলভাবে ডাটাবেজে সিঙ্ক করা হয়েছে!');
-    } catch (err) {
-      console.error("Error seeding library resources:", err);
-      alert("Failed to seed library resources: " + (err instanceof Error ? err.message : String(err)));
-    } finally {
-      setIsSeeding(false);
-    }
-  };
 
   // Open Add Resource Modal
   const handleOpenAddModal = () => {
@@ -246,8 +163,8 @@ export default function LibraryPage() {
     }
   };
 
-  // Dynamic resources list combining Firestore with fallback if loading or Firestore is empty
-  const displayResources = resources.length > 0 ? resources : (loading ? [] : defaultMockResources);
+  // Dynamic resources list from Firestore (Zero dummy fallback data)
+  const displayResources = resources;
 
   const filteredResources = displayResources.filter(r => {
     const matchesSearch = r.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -283,18 +200,6 @@ export default function LibraryPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {resources.length === 0 && !loading && isAuthorized && (
-            <button 
-              onClick={handleSeedResources}
-              disabled={isSeeding}
-              className="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5 disabled:opacity-50"
-              title="Seed mock resources to Firestore"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSeeding ? 'animate-spin' : ''}`} />
-              {isSeeding ? (locale === 'en' ? 'Syncing...' : 'সিঙ্ক হচ্ছে...') : (locale === 'en' ? 'Seed DB Catalog' : 'ডাটাবেজে সিঙ্ক করুন')}
-            </button>
-          )}
-
           {isAuthorized && (
             <button 
               onClick={handleOpenAddModal}

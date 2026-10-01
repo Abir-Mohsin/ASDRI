@@ -26,7 +26,6 @@ export default async function LibraryPage({
           : locale === 'ar'
           ? 'مستودع شامل للتراث الإسلامي، والمخطوطات النادرة، والبحوث الأكاديمية المعاصرة.'
           : 'A vast repository of authentic Islamic knowledge, rare manuscripts, and contemporary academic research accessible to students and scholars worldwide.'}
-        fallbackBannerUrl="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1200&q=80"
       >
         {/* Dynamic & Real-time editable Digital Library Portal with 60,000+ Books Mega Cloud Vault & Categorized Collections */}
         <LibraryPageContent locale={locale} />

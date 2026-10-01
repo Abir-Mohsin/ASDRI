@@ -284,7 +284,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
           
           <div className="flex items-center gap-4">
             <img
-              src={profile.photoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
+              src={(profile.photoUrl && profile.photoUrl.trim() !== '') ? profile.photoUrl.trim() : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
               alt={profile.fullName}
               className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-amber-400/80 shadow-md"
             />

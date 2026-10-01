@@ -12,7 +12,7 @@ export function parseVideoUrl(url: string, customThumbnail?: string): ParsedVide
     return {
       type: 'unknown',
       embedUrl: '',
-      thumbnailUrl: customThumbnail || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80',
+      thumbnailUrl: customThumbnail?.trim() || '',
     };
   }
 
@@ -38,7 +38,7 @@ export function parseVideoUrl(url: string, customThumbnail?: string): ParsedVide
     return {
       type: 'drive',
       embedUrl: `https://drive.google.com/file/d/${driveId}/preview`,
-      thumbnailUrl: customThumbnail?.trim() || 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80',
+      thumbnailUrl: customThumbnail?.trim() || '',
     };
   }
 
@@ -48,7 +48,7 @@ export function parseVideoUrl(url: string, customThumbnail?: string): ParsedVide
     return {
       type: 'vimeo',
       embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`,
-      thumbnailUrl: customThumbnail?.trim() || 'https://images.unsplash.com/photo-1542816417-0983cbe33577?auto=format&fit=crop&w=800&q=80',
+      thumbnailUrl: customThumbnail?.trim() || '',
     };
   }
 
@@ -58,7 +58,7 @@ export function parseVideoUrl(url: string, customThumbnail?: string): ParsedVide
       type: 'direct',
       embedUrl: trimmed,
       directUrl: trimmed,
-      thumbnailUrl: customThumbnail?.trim() || 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80',
+      thumbnailUrl: customThumbnail?.trim() || '',
     };
   }
 
@@ -66,6 +66,6 @@ export function parseVideoUrl(url: string, customThumbnail?: string): ParsedVide
   return {
     type: 'unknown',
     embedUrl: trimmed,
-    thumbnailUrl: customThumbnail?.trim() || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80',
+    thumbnailUrl: customThumbnail?.trim() || '',
   };
 }

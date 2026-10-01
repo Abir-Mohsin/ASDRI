@@ -7,7 +7,7 @@ import {
 import { 
   Award, Sparkles, Quote, CheckCircle2, 
   MapPin, Briefcase, GraduationCap, ChevronRight,
-  ExternalLink, BookOpen, Star, Filter
+  ExternalLink, BookOpen, Star, Filter, User
 } from 'lucide-react';
 
 interface AlumniSuccessStoriesViewProps {
@@ -54,11 +54,17 @@ export function AlumniSuccessStoriesView({ stories = INITIAL_SUCCESS_STORIES }: 
           <div className="flex flex-col lg:flex-row items-center gap-8">
             <div className="w-full lg:w-1/3 shrink-0 text-center">
               <div className="relative inline-block">
-                <img
-                  src={featuredStory.photoUrl}
-                  alt={featuredStory.name}
-                  className="w-48 h-48 sm:w-56 sm:h-56 rounded-3xl object-cover border-4 border-emerald-100 shadow-md mx-auto"
-                />
+                {featuredStory?.photoUrl?.trim() ? (
+                  <img
+                    src={featuredStory.photoUrl.trim()}
+                    alt={featuredStory.name}
+                    className="w-48 h-48 sm:w-56 sm:h-56 rounded-3xl object-cover border-4 border-emerald-100 shadow-md mx-auto"
+                  />
+                ) : (
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-3xl bg-emerald-950 border-4 border-emerald-100 shadow-md mx-auto flex items-center justify-center text-amber-300">
+                    <User className="w-20 h-20 opacity-70" />
+                  </div>
+                )}
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 font-extrabold text-[11px] px-3.5 py-1 rounded-full shadow-xs whitespace-nowrap flex items-center gap-1.5">
                   <Star className="w-3.5 h-3.5 fill-slate-950" />
                   <span>Spotlight Scholar</span>
@@ -155,11 +161,17 @@ export function AlumniSuccessStoriesView({ stories = INITIAL_SUCCESS_STORIES }: 
             >
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <img
-                    src={story.photoUrl}
-                    alt={story.name}
-                    className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100 shadow-xs group-hover:scale-105 transition-transform"
-                  />
+                  {Boolean(story.photoUrl && story.photoUrl.trim() !== '') ? (
+                    <img
+                      src={story.photoUrl.trim()}
+                      alt={story.name}
+                      className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100 shadow-xs group-hover:scale-105 transition-transform"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-2xl bg-emerald-950 border-2 border-emerald-100 shadow-xs flex items-center justify-center text-amber-300 shrink-0">
+                      <User className="w-8 h-8 opacity-70" />
+                    </div>
+                  )}
                   <div>
                     <h3 className="text-base font-bold font-serif text-slate-900 group-hover:text-emerald-800 transition-colors">
                       {story.name}
@@ -208,11 +220,17 @@ export function AlumniSuccessStoriesView({ stories = INITIAL_SUCCESS_STORIES }: 
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto space-y-6">
             <div className="flex items-start justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-4">
-                <img
-                  src={selectedStory.photoUrl}
-                  alt={selectedStory.name}
-                  className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100"
-                />
+                {Boolean(selectedStory.photoUrl && selectedStory.photoUrl.trim() !== '') ? (
+                  <img
+                    src={selectedStory.photoUrl.trim()}
+                    alt={selectedStory.name}
+                    className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-950 border-2 border-emerald-100 flex items-center justify-center text-amber-300 shrink-0">
+                    <User className="w-8 h-8 opacity-70" />
+                  </div>
+                )}
                 <div>
                   <h3 className="text-lg font-bold font-serif text-slate-900">{selectedStory.name}</h3>
                   <p className="text-xs text-emerald-800 font-bold">{selectedStory.currentRole}</p>

@@ -29,6 +29,8 @@ export function HomeResearchSpotlight({ locale }: HomeResearchSpotlightProps) {
       authorLabel: 'Scholar / Author:',
       dateLabel: 'Published:',
       peerReviewed: 'Peer-Reviewed Journal',
+      noPapers: 'ASDRI research repository is being curated. Peer-reviewed papers will be published following editorial committee review.',
+      submitPaper: 'Submit Research Paper'
     },
     bn: {
       badge: 'ইসলামিক গবেষণা ও উচ্চতর প্রকাশনা',
@@ -40,6 +42,8 @@ export function HomeResearchSpotlight({ locale }: HomeResearchSpotlightProps) {
       authorLabel: 'গবেষক স্কলার:',
       dateLabel: 'প্রকাশকাল:',
       peerReviewed: 'পিয়ার-রিভিউড জার্নাল',
+      noPapers: 'আস-সুন্নাহ দাওয়াহ অ্যান্ড রিসার্চ ইনস্টিটিউট পিয়ার-রিভিউড গবেষণাপত্র প্রকাশের প্রস্তুতি চলছে। গবেষক ও আলেমদের থেকে নতুন প্রবন্ধ আহ্বান করা হচ্ছে।',
+      submitPaper: 'গবেষণাপত্র জমা দিন'
     },
     ar: {
       badge: 'البحوث والدراسات الأكاديمية',
@@ -51,58 +55,12 @@ export function HomeResearchSpotlight({ locale }: HomeResearchSpotlightProps) {
       authorLabel: 'الباحث الأكاديمي:',
       dateLabel: 'تاريخ النشر:',
       peerReviewed: 'مجلة علمية محكمة',
+      noPapers: 'يجري إعداد مستودع الأبحاث المحكمة لمعهد السنة وسيتم نشر الأبحاث المعتمدة تباعاً.',
+      submitPaper: 'تقديم بحث علمي'
     }
   };
 
   const t = dict[locale] || dict.en;
-
-  const defaultPapers = [
-    {
-      id: 'rp-1',
-      title: locale === 'bn' 
-        ? 'ইসলামী অর্থনীতিতে ক্রিপ্টোকারেন্সি ও ডিজিটাল অ্যাসেটের শরীয়াহ মূল্যায়ন' 
-        : locale === 'ar' 
-        ? 'التقييم الشرعي للعملات المشفرة والأصول الرقمية' 
-        : 'Application of Fiqh al-Nawazil in Modern Financial Contracts & Digital Asset Valuation',
-      abstract: locale === 'bn' 
-        ? 'ক্রিপ্টোকারেন্সি এবং ব্লকচেইন প্রযুক্তির একটি সামগ্রিক বিশ্লেষণ যার মধ্যে আধুনিক লেনদেন কাঠামোর শরীয়াহ নির্দেশিকা এবং মাকাসিদ আশ-শরীয়াহ আলোচনা করা হয়েছে।' 
-        : 'An analytical investigation of contemporary jurisprudential rulings regarding decentralized protocols, smart contracts, and Shariah-compliant digital asset management.',
-      category: 'Islamic Economics & Finance',
-      authorName: locale === 'bn' ? 'প্রফেসর মাহমুদ হাসান আল-আজহারী' : 'Prof. Mahmud Hasan al-Azhari',
-      publishedAt: 'May 2026',
-      downloadCount: 420
-    },
-    {
-      id: 'rp-2',
-      title: locale === 'bn' 
-        ? 'সমকালীন সমাজে ফিকহুল আক্বলিয়্যাত (সংখ্যালঘু মুসলিম ফিকাহ)-এর প্রয়োগ' 
-        : locale === 'ar' 
-        ? 'تطبيقات فقه الأقليات المسلمة في المجتمعات المعاصرة' 
-        : 'Contemporary Jurisprudence of Muslim Minorities (Fiqh al-Aqalliyyat): Principles and Methodologies',
-      abstract: locale === 'bn' 
-        ? 'অমুসলিম প্রধান দেশসমূহে মুসলিম সংখ্যালঘু সমাজের নাগরিক অধিকার, পারিবারিক আইন ও পারস্পরিক সহাবস্থানের ওপর একটি প্রামাণ্য শাস্ত্রীয় গবেষণা।' 
-        : 'A comprehensive study examining Islamic legal methodology for Muslim communities residing in non-Muslim majority nations, emphasizing civic duties and legal ethics.',
-      category: 'Islamic Jurisprudence (Usul al-Fiqh)',
-      authorName: locale === 'bn' ? 'ড. আনোয়ারুল ইসলাম মাদানী' : 'Dr. Anwarul Islam Madani',
-      publishedAt: 'March 2026',
-      downloadCount: 315
-    },
-    {
-      id: 'rp-3',
-      title: locale === 'bn' 
-        ? 'মাকাসিদ আশ-শরীয়াহর আলোকে বায়োমেডিক্যাল এথিক্স ও জেনেটিক ইঞ্জিনিয়ারিং' 
-        : locale === 'ar' 
-        ? 'الأخلاقيات الطبية الحيوية والهندسة الوراثية في ضوء مقاصد الشريعة' 
-        : 'Biomedical Ethics, Stem Cell Therapy & Genetic Modification in Light of Maqasid al-Shariah',
-      abstract: locale === 'bn' 
-        ? 'আধুনিক চিকিৎসা বিজ্ঞানের ক্লোনিং, অর্গান ট্রান্সপ্লান্টেশন এবং জেনেটিক থেরাপির ক্ষেত্রে শরীয়াহর উদ্দেশ্য ও মূলনীতি সংক্রান্ত সমন্বিত পর্যালোচনা।' 
-        : 'Critical ethical and jurisprudential analysis on CRISPR gene editing, human cloning prohibitions, and organ transplantation based on primary Shariah imperatives.',
-      category: 'Theology & Biomedical Fiqh',
-      authorName: locale === 'bn' ? 'মুফতি ড. তারিকুল ইসলাম' : 'Mufti Dr. Tariqul Islam',
-      publishedAt: 'January 2026',
-      downloadCount: 580
-    }
-  ];
 
   useEffect(() => {
     const fetchResearchPapers = async () => {
@@ -117,11 +75,11 @@ export function HomeResearchSpotlight({ locale }: HomeResearchSpotlightProps) {
           const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setPapers(list);
         } else {
-          setPapers(defaultPapers);
+          setPapers([]);
         }
       } catch (err) {
         console.warn('Notice loading home research papers:', err);
-        setPapers(defaultPapers);
+        setPapers([]);
       } finally {
         setIsLoading(false);
       }
@@ -147,6 +105,20 @@ export function HomeResearchSpotlight({ locale }: HomeResearchSpotlightProps) {
           <div className="py-12 text-center flex flex-col justify-center items-center gap-3">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#064e3b]"></div>
             <span className="text-xs text-slate-400">Loading publications...</span>
+          </div>
+        ) : papers.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-3xl border border-slate-200 shadow-2xs p-8 max-w-xl mx-auto">
+            <FileText className="w-12 h-12 text-emerald-800/40 mx-auto mb-3" />
+            <p className="text-slate-600 text-xs sm:text-sm font-medium leading-relaxed mb-6">
+              {t.noPapers}
+            </p>
+            <Link
+              href={`/${locale}/research`}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#064e3b] hover:bg-emerald-900 text-white text-xs font-bold transition-all shadow-xs"
+            >
+              <span>{t.viewAll}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

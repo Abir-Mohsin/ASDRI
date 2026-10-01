@@ -26,7 +26,6 @@ export default async function CoursesPage({
           : locale === 'ar' 
           ? 'اكتشف مجموعتنا الشاملة من المقررات الشرعية المصممة لتأهيل جيل متمكن علمياً وعملياً لخدمة الأمة.' 
           : 'Discover our comprehensive range of Islamic courses designed to nurture knowledgeable, balanced, and productive members of the Ummah.'}
-        fallbackBannerUrl="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80"
       >
         {/* Dynamic and real-time editable curriculum intro, course highlights & interactive portal */}
         <CoursesPageContent locale={locale} />

@@ -34,7 +34,6 @@ export default async function AdmissionPage({
         locale={locale}
         fallbackTitle={titles[locale] || titles.en}
         fallbackSubtitle={subtitles[locale] || subtitles.en}
-        fallbackBannerUrl="https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=1600&q=80"
       >
         <AdmissionPageContent locale={locale} />
       </DynamicPageRenderer>

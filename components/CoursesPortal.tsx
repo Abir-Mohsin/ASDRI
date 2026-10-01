@@ -187,12 +187,18 @@ export function CoursesPortal({ locale }: CoursesPortalProps) {
               >
                 {/* Card Top: Banner Poster Area */}
                 <div className="w-full h-48 sm:h-52 relative bg-slate-100 overflow-hidden shrink-0">
-                  <img 
-                    src={coverUrl} 
-                    alt={courseTitle}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    referrerPolicy="no-referrer"
-                  />
+                  {coverUrl ? (
+                    <img 
+                      src={coverUrl} 
+                      alt={courseTitle}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-emerald-950 flex items-center justify-center text-amber-300">
+                      <GraduationCap className="w-12 h-12 opacity-60" />
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                   
                   {/* Top Badges */}

@@ -136,11 +136,17 @@ export function AlumniDigitalVerificationModal({
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <img
-                      src={result.photoUrl}
-                      alt={result.fullName}
-                      className="w-16 h-16 rounded-xl object-cover border-2 border-emerald-400 shadow-xs"
-                    />
+                    {Boolean(result.photoUrl && result.photoUrl.trim() !== '') ? (
+                      <img
+                        src={result.photoUrl.trim()}
+                        alt={result.fullName}
+                        className="w-16 h-16 rounded-xl object-cover border-2 border-emerald-400 shadow-xs"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-xl bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-emerald-800 shrink-0">
+                        <User className="w-8 h-8" />
+                      </div>
+                    )}
                     <div>
                       <h4 className="text-base font-bold font-serif text-slate-900">{result.fullName}</h4>
                       <p className="text-xs font-bold text-[#064e3b]">{result.profession}</p>

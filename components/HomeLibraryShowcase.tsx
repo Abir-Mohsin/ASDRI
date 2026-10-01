@@ -19,7 +19,7 @@ interface HomeLibraryShowcaseProps {
 export function HomeLibraryShowcase({ locale }: HomeLibraryShowcaseProps) {
   const router = useRouter();
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [featuredBooks, setFeaturedBooks] = useState<LibraryBook[]>(DEFAULT_LIBRARY_BOOKS.slice(0, 4));
+  const [featuredBooks, setFeaturedBooks] = useState<LibraryBook[]>([]);
 
   const dict = {
     en: {
@@ -143,52 +143,54 @@ export function HomeLibraryShowcase({ locale }: HomeLibraryShowcaseProps) {
         </div>
 
         {/* Featured Book Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {featuredBooks.map((book, idx) => (
-            <div 
-              key={book.id || idx}
-              className="bg-white/10 hover:bg-white/15 backdrop-blur-xs rounded-2xl p-5 border border-white/15 hover:border-amber-400/50 transition-all duration-300 flex flex-col justify-between group"
-            >
-              <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-800/80 border border-emerald-600/50 flex items-center justify-center text-amber-300 shadow-xs">
-                  <BookOpen className="w-5 h-5" />
-                </div>
+        {featuredBooks.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {featuredBooks.map((book, idx) => (
+              <div 
+                key={book.id || idx}
+                className="bg-white/10 hover:bg-white/15 backdrop-blur-xs rounded-2xl p-5 border border-white/15 hover:border-amber-400/50 transition-all duration-300 flex flex-col justify-between group"
+              >
+                <div className="space-y-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-800/80 border border-emerald-600/50 flex items-center justify-center text-amber-300 shadow-xs">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
 
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300/80">
-                    {book.category}
-                  </span>
-                  <h3 className="text-sm font-bold text-white font-serif line-clamp-2 group-hover:text-amber-300 transition-colors">
-                    {book.title}
-                  </h3>
-                </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300/80">
+                      {book.category}
+                    </span>
+                    <h3 className="text-sm font-bold text-white font-serif line-clamp-2 group-hover:text-amber-300 transition-colors">
+                      {book.title}
+                    </h3>
+                  </div>
 
-                <p className="text-[11px] text-emerald-100/70 line-clamp-1">
-                  <span className="text-emerald-300 font-medium">{t.author}</span> {book.author}
-                </p>
-
-                {book.description && (
-                  <p className="text-[11px] text-emerald-100/60 line-clamp-2 leading-relaxed">
-                    {book.description}
+                  <p className="text-[11px] text-emerald-100/70 line-clamp-1">
+                    <span className="text-emerald-300 font-medium">{t.author}</span> {book.author}
                   </p>
-                )}
-              </div>
 
-              <div className="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[10px] font-mono text-emerald-300/70">
-                  {book.language || 'Arabic / Multilingual'}
-                </span>
-                <Link
-                  href={`/${locale}/library?q=${encodeURIComponent(book.title)}`}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-amber-300 hover:text-amber-200"
-                >
-                  <span>{t.readOnline}</span>
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
+                  {book.description && (
+                    <p className="text-[11px] text-emerald-100/60 line-clamp-2 leading-relaxed">
+                      {book.description}
+                    </p>
+                  )}
+                </div>
+
+                <div className="pt-4 mt-4 border-t border-white/10 flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-emerald-300/70">
+                    {book.language || 'Arabic / Multilingual'}
+                  </span>
+                  <Link
+                    href={`/${locale}/library?q=${encodeURIComponent(book.title)}`}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-amber-300 hover:text-amber-200"
+                  >
+                    <span>{t.readOnline}</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Explore All Library CTA */}
         <div className="text-center mt-10">

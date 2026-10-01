@@ -229,6 +229,26 @@ export function LibraryStaffDashboard() {
     }
   };
 
+  // Clear All Library Data (Dummy data removal)
+  const handleClearAllLibraryData = async () => {
+    if (!confirm('আপনি কি নিশ্চিত যে আপনি সকল ক্যাটালগ ও লোণ ডেটা মুছে ডাটাবেজ খালি করতে চান?')) return;
+    setIsSeeding(true);
+    try {
+      const booksSnap = await getDocs(collection(db, 'library_books'));
+      const loansSnap = await getDocs(collection(db, 'book_loans'));
+      const batch = writeBatch(db);
+      booksSnap.docs.forEach(d => batch.delete(d.ref));
+      loansSnap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+      alert('সকল লাইব্রেরি ডেটা সফলভাবে মুছে ফেলা হয়েছে।');
+      await fetchData();
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, 'library_clear_all');
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
   // Create or Update Book
   const handleSaveBook = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -482,6 +502,14 @@ export function LibraryStaffDashboard() {
             >
               <Clock className="w-4 h-4" />
               Circulation & Loans
+            </button>
+            <button 
+              onClick={handleClearAllLibraryData}
+              disabled={isSeeding}
+              className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white border border-rose-600 text-xs font-bold rounded-2xl shadow-xs transition-all flex items-center gap-2 disabled:opacity-50"
+            >
+              <Trash2 className="w-4 h-4" />
+              🗑️ সকল ডামি বই ও ডেটা মুছে ফেলুন
             </button>
           </div>
         </div>

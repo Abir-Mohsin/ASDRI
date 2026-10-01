@@ -14,7 +14,7 @@ import {
   CommitteeMember, GlobalChapter
 } from '@/lib/alumniAssociationTypes';
 import { 
-  Users, Award, ShieldCheck, CheckCircle2, XCircle, 
+  Users, User, Award, ShieldCheck, CheckCircle2, XCircle, 
   Clock, Plus, Search, Filter, Download, Edit3, 
   Trash2, Eye, Calendar, Briefcase, Bell, 
   Sparkles, Check, AlertCircle, FileSpreadsheet,
@@ -231,7 +231,7 @@ export function AlumniAdminManager() {
       location: newEventLocation,
       type: newEventType,
       description: newEventDesc,
-      coverImage: 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80',
+      coverImage: '',
       registrationDeadline: newEventDate,
       registrationLimit: Number(newEventLimit),
       registeredCount: 0,
@@ -607,11 +607,17 @@ export function AlumniAdminManager() {
                   <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="p-3.5">
                       <div className="flex items-center gap-3">
-                        <img
-                          src={m.photoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
-                          alt={m.fullName}
-                          className="w-9 h-9 rounded-xl object-cover border border-slate-200"
-                        />
+                        {Boolean(m.photoUrl && m.photoUrl.trim() !== '') ? (
+                          <img
+                            src={m.photoUrl.trim()}
+                            alt={m.fullName}
+                            className="w-9 h-9 rounded-xl object-cover border border-slate-200"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-800">
+                            <User className="w-4 h-4" />
+                          </div>
+                        )}
                         <div>
                           <p className="font-bold text-slate-900">{m.fullName}</p>
                           <p className="text-[10px] text-slate-400">{m.email}</p>
@@ -678,11 +684,17 @@ export function AlumniAdminManager() {
               {pendingProfiles.map((p) => (
                 <div key={p.id} className="p-6 rounded-3xl border border-amber-200 bg-amber-50/30 space-y-4">
                   <div className="flex items-start gap-4">
-                    <img
-                      src={p.photoUrl}
-                      alt={p.fullName}
-                      className="w-14 h-14 rounded-2xl object-cover border border-amber-300"
-                    />
+                    {Boolean(p.photoUrl && p.photoUrl.trim() !== '') ? (
+                      <img
+                        src={p.photoUrl.trim()}
+                        alt={p.fullName}
+                        className="w-14 h-14 rounded-2xl object-cover border border-amber-300"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800 shrink-0">
+                        <User className="w-6 h-6" />
+                      </div>
+                    )}
                     <div className="space-y-1">
                       <h3 className="text-base font-bold text-slate-900 font-serif">{p.fullName}</h3>
                       <p className="text-xs text-emerald-800 font-semibold">{p.batch} • {p.program}</p>
@@ -735,11 +747,17 @@ export function AlumniAdminManager() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {committee.map((m) => (
               <div key={m.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center gap-4">
-                <img
-                  src={m.photoUrl}
-                  alt={m.name}
-                  className="w-14 h-14 rounded-2xl object-cover border border-emerald-200"
-                />
+                {Boolean(m.photoUrl && m.photoUrl.trim() !== '') ? (
+                  <img
+                    src={m.photoUrl.trim()}
+                    alt={m.name}
+                    className="w-14 h-14 rounded-2xl object-cover border border-emerald-200"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-800 shrink-0">
+                    <User className="w-6 h-6" />
+                  </div>
+                )}
                 <div className="space-y-0.5">
                   <h3 className="text-sm font-bold text-slate-900 font-serif">{m.name}</h3>
                   <p className="text-xs text-emerald-800 font-bold">{m.designation}</p>
@@ -918,7 +936,13 @@ export function AlumniAdminManager() {
             {verifiedProfiles.filter(p => p.mentorshipOffer && p.mentorshipOffer.length > 0).map(m => (
               <div key={m.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
                 <div className="flex items-center gap-3">
-                  <img src={m.photoUrl} alt={m.fullName} className="w-12 h-12 rounded-xl object-cover" />
+                  {Boolean(m.photoUrl && m.photoUrl.trim() !== '') ? (
+                    <img src={m.photoUrl.trim()} alt={m.fullName} className="w-12 h-12 rounded-xl object-cover" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
+                      <User className="w-5 h-5" />
+                    </div>
+                  )}
                   <div>
                     <h3 className="text-xs font-bold text-slate-900">{m.fullName}</h3>
                     <p className="text-[10px] text-emerald-800 font-semibold">{m.profession}</p>
@@ -1282,11 +1306,17 @@ export function AlumniAdminManager() {
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6">
             <div className="flex items-start justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-4">
-                <img
-                  src={selectedProfile.photoUrl}
-                  alt={selectedProfile.fullName}
-                  className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100"
-                />
+                {Boolean(selectedProfile.photoUrl && selectedProfile.photoUrl.trim() !== '') ? (
+                  <img
+                    src={selectedProfile.photoUrl.trim()}
+                    alt={selectedProfile.fullName}
+                    className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center text-emerald-800 shrink-0">
+                    <User className="w-8 h-8" />
+                  </div>
+                )}
                 <div>
                   <h3 className="text-lg font-bold font-serif text-slate-900">{selectedProfile.fullName}</h3>
                   <p className="text-xs text-emerald-800 font-bold">{selectedProfile.profession} • {selectedProfile.organization}</p>

@@ -7,7 +7,7 @@ import {
   INITIAL_GLOBAL_CHAPTERS, INITIAL_MEMBERSHIP_TIERS
 } from '@/lib/alumniAssociationTypes';
 import { 
-  Users, Award, ShieldCheck, HeartHandshake, 
+  Users, Award, User, ShieldCheck, HeartHandshake, 
   Globe, BookOpen, CheckCircle2, ChevronRight, 
   Sparkles, Mail, Phone, ExternalLink, HandHeart, 
   Landmark, ArrowUpRight, FileText, Check, X
@@ -103,11 +103,17 @@ export function AlumniAssociationView({ initialSubTab = 'committee' }: AlumniAss
                   key={adv.id}
                   className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs hover:shadow-md transition-all flex flex-col sm:flex-row items-start sm:items-center gap-4 group"
                 >
-                  <img
-                    src={adv.photoUrl}
-                    alt={adv.name}
-                    className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-emerald-600/30 group-hover:scale-105 transition-transform shrink-0"
-                  />
+                  {Boolean(adv.photoUrl && adv.photoUrl.trim() !== '') ? (
+                    <img
+                      src={adv.photoUrl.trim()}
+                      alt={adv.name}
+                      className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-emerald-600/30 group-hover:scale-105 transition-transform shrink-0"
+                    />
+                  ) : (
+                    <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-emerald-50 border-2 border-emerald-600/30 flex items-center justify-center text-emerald-800 shrink-0">
+                      <User className="w-8 h-8" />
+                    </div>
+                  )}
                   <div className="space-y-1 min-w-0">
                     <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900">
                       {adv.designation}
@@ -151,11 +157,17 @@ export function AlumniAssociationView({ initialSubTab = 'committee' }: AlumniAss
                   className="bg-white rounded-3xl p-5 border border-slate-100 shadow-2xs hover:shadow-md transition-all space-y-4 group flex flex-col justify-between"
                 >
                   <div className="flex items-center gap-4">
-                    <img
-                      src={member.photoUrl}
-                      alt={member.name}
-                      className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-600/30 group-hover:scale-105 transition-transform shrink-0"
-                    />
+                    {Boolean(member.photoUrl && member.photoUrl.trim() !== '') ? (
+                      <img
+                        src={member.photoUrl.trim()}
+                        alt={member.name}
+                        className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-600/30 group-hover:scale-105 transition-transform shrink-0"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-50 border-2 border-emerald-600/30 flex items-center justify-center text-emerald-800 shrink-0">
+                        <User className="w-7 h-7" />
+                      </div>
+                    )}
                     <div className="space-y-1 min-w-0">
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 block w-fit truncate">
                         {member.designation}
@@ -220,11 +232,17 @@ export function AlumniAssociationView({ initialSubTab = 'committee' }: AlumniAss
               >
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={wing.leadPhoto}
-                      alt={wing.leadName}
-                      className="w-12 h-12 rounded-xl object-cover border border-emerald-600/30 shrink-0"
-                    />
+                    {Boolean(wing.leadPhoto && wing.leadPhoto.trim() !== '') ? (
+                      <img
+                        src={wing.leadPhoto.trim()}
+                        alt={wing.leadName}
+                        className="w-12 h-12 rounded-xl object-cover border border-emerald-600/30 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-600/30 flex items-center justify-center text-emerald-800 shrink-0">
+                        <User className="w-6 h-6" />
+                      </div>
+                    )}
                     <div>
                       <h3 className="text-base font-bold font-serif text-slate-900">
                         {wing.name}

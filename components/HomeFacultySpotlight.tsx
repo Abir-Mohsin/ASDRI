@@ -113,9 +113,9 @@ export function HomeFacultySpotlight({ locale }: HomeFacultySpotlightProps) {
                 <div>
                   {/* Photo */}
                   <div className="w-full h-48 bg-slate-100 relative overflow-hidden flex items-center justify-center">
-                    {member.photoUrl ? (
+                    {member.photoUrl?.trim() ? (
                       <img 
-                        src={member.photoUrl}
+                        src={member.photoUrl.trim()}
                         alt={getLocalizedName(member)}
                         className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {

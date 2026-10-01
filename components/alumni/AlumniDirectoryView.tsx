@@ -209,11 +209,17 @@ export function AlumniDirectoryView({ alumniList, isLoggedInAlumni = false }: Al
                 {/* Header: Photo, Name & ID */}
                 <div className="flex items-start gap-4">
                   <div className="relative shrink-0">
-                    <img
-                      src={alumnus.photoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
-                      alt={alumnus.fullName}
-                      className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100 shadow-xs group-hover:scale-105 transition-transform"
-                    />
+                    {Boolean(alumnus.photoUrl && alumnus.photoUrl.trim() !== '') ? (
+                      <img
+                        src={alumnus.photoUrl.trim()}
+                        alt={alumnus.fullName}
+                        className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-100 shadow-xs group-hover:scale-105 transition-transform"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center text-emerald-800 shadow-xs group-hover:scale-105 transition-transform">
+                        <User className="w-8 h-8 opacity-70" />
+                      </div>
+                    )}
                     <span className="absolute -bottom-1.5 -right-1 bg-emerald-600 text-white p-0.5 rounded-full ring-2 ring-white">
                       <ShieldCheck className="w-3.5 h-3.5" />
                     </span>
@@ -341,11 +347,17 @@ export function AlumniDirectoryView({ alumniList, isLoggedInAlumni = false }: Al
                 <>
                   {/* Profile Header Row */}
                   <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
-                    <img
-                      src={selectedProfile.photoUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
-                      alt={selectedProfile.fullName}
-                      className="w-24 h-24 rounded-2xl object-cover border-4 border-emerald-100 shadow-md"
-                    />
+                    {Boolean(selectedProfile.photoUrl && selectedProfile.photoUrl.trim() !== '') ? (
+                      <img
+                        src={selectedProfile.photoUrl.trim()}
+                        alt={selectedProfile.fullName}
+                        className="w-24 h-24 rounded-2xl object-cover border-4 border-emerald-100 shadow-md"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-2xl bg-emerald-50 border-4 border-emerald-100 flex items-center justify-center text-emerald-800 shadow-md">
+                        <User className="w-12 h-12 opacity-70" />
+                      </div>
+                    )}
 
                     <div className="space-y-1.5 flex-1">
                       <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">

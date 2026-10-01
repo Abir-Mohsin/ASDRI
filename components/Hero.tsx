@@ -77,7 +77,7 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
     totalApplications: 0,
     approvedAdmissions: 0,
     scholarshipApplicants: 0,
-    totalPrograms: COURSES.length,
+    totalPrograms: 0,
     isLoading: true
   });
 
@@ -135,12 +135,10 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
     const unsubscribeCourses = onSnapshot(
       coursesRef,
       (snapshot) => {
-        if (!snapshot.empty) {
-          setAdmissionStats((prev) => ({
-            ...prev,
-            totalPrograms: snapshot.size
-          }));
-        }
+        setAdmissionStats((prev) => ({
+          ...prev,
+          totalPrograms: snapshot.size
+        }));
       },
       (err) => {
         console.warn('Courses count listener notice:', err);
@@ -206,14 +204,13 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
       ? customHighlights
       : defaultHighlights[locale] || defaultHighlights.en;
 
-  const fallbackImage =
-    'https://images.unsplash.com/photo-1542816417-0983c9c9ad53?auto=format&fit=crop&w=2400&q=85';
+  const fallbackImage = '';
 
-  const rawImage = data?.bannerImageUrl || fallbackImage;
-  const isDrive = isGoogleDriveUrl(rawImage);
-  const candidates = isDrive ? getDriveImageCandidates(rawImage) : [rawImage];
-  const currentCandidate = candidates[candidateIndex] || fallbackImage;
-  const optimizedImage = imgError ? fallbackImage : (isDrive ? currentCandidate : getOptimizedImageUrl(rawImage, fallbackImage));
+  const rawImage = data?.bannerImageUrl || '';
+  const isDrive = rawImage ? isGoogleDriveUrl(rawImage) : false;
+  const candidates = isDrive ? getDriveImageCandidates(rawImage) : (rawImage ? [rawImage] : []);
+  const currentCandidate = candidates[candidateIndex] || '';
+  const optimizedImage = imgError || !rawImage ? '' : (isDrive ? currentCandidate : getOptimizedImageUrl(rawImage, ''));
 
   // Overlay Opacity: default 75%
   const opacityVal = typeof data?.overlayOpacity === 'number' ? Math.max(0, Math.min(100, data.overlayOpacity)) : 75;
@@ -264,21 +261,23 @@ export function Hero({ dict, locale }: { dict: any; locale: Locale }) {
     <div className="relative w-full bg-[#064e3b] overflow-hidden min-h-[560px] sm:min-h-[620px] flex items-center">
       {/* Edge-to-edge background image */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          key={`${optimizedImage}_${candidateIndex}`}
-          src={optimizedImage}
-          alt="As-Sunnah Dawah and Research Institute Campus & Architecture"
-          referrerPolicy="no-referrer"
-          onError={() => {
-            if (candidateIndex < candidates.length - 1) {
-              setCandidateIndex((prev) => prev + 1);
-            } else if (!imgError) {
-              setImgError(true);
-            }
-          }}
-          className="w-full h-full object-cover object-center scale-105 transform filter brightness-95 transition-transform duration-1000"
-        />
+        {Boolean(optimizedImage && optimizedImage.trim() !== '') ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            key={`${optimizedImage}_${candidateIndex}`}
+            src={optimizedImage}
+            alt="As-Sunnah Dawah and Research Institute Campus & Architecture"
+            referrerPolicy="no-referrer"
+            onError={() => {
+              if (candidateIndex < candidates.length - 1) {
+                setCandidateIndex((prev) => prev + 1);
+              } else if (!imgError) {
+                setImgError(true);
+              }
+            }}
+            className="w-full h-full object-cover object-center scale-105 transform filter brightness-95 transition-transform duration-1000"
+          />
+        ) : null}
 
         {/* Dynamic Admin-Controlled Overlay Shape & Opacity */}
         <div

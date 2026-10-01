@@ -104,12 +104,19 @@ export function AlumniEventsView({ events, userProfile, onEventRegistered }: Alu
               className="bg-white rounded-3xl border border-slate-100 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between"
             >
               {/* Event Cover Image */}
-              <div className="relative h-48 w-full overflow-hidden bg-emerald-950">
-                <img
-                  src={event.coverImage || 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80'}
-                  alt={event.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
+              <div className="relative h-48 w-full overflow-hidden bg-emerald-950 flex items-center justify-center">
+                {event.coverImage ? (
+                  <img
+                    src={event.coverImage}
+                    alt={event.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[#064e3b] to-emerald-950 flex flex-col items-center justify-center text-emerald-100">
+                    <Calendar className="w-12 h-12 text-amber-300 mb-1 opacity-75" />
+                    <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-200">ASDRI Alumni Event</span>
+                  </div>
+                )}
                 
                 {/* Event Type Badge */}
                 <div className="absolute top-3 left-3">

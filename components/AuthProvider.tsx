@@ -20,7 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         unsubscribeUserDoc = null;
       }
 
-      const isSuperAdminEmail = firebaseUser.email === 'abirmohsin02@gmail.com';
+      const isSuperAdminEmail = firebaseUser.email?.trim().toLowerCase() === 'abirmohsin02@gmail.com';
 
       // Instantly grant super_admin state for abirmohsin02@gmail.com
       if (isSuperAdminEmail) {

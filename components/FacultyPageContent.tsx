@@ -258,9 +258,9 @@ export function FacultyPageContent({ locale }: { locale: Locale }) {
                   <div>
                     {/* Top image & badge */}
                     <div className="relative h-60 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent overflow-hidden flex items-center justify-center bg-slate-100">
-                      {member.photoUrl ? (
+                      {member.photoUrl?.trim() ? (
                         <img
-                          src={member.photoUrl}
+                          src={member.photoUrl.trim()}
                           alt={localizedName}
                           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"
@@ -363,9 +363,9 @@ export function FacultyPageContent({ locale }: { locale: Locale }) {
 
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
                   <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md shrink-0 bg-emerald-950 flex items-center justify-center">
-                    {selectedFaculty.photoUrl ? (
+                    {selectedFaculty.photoUrl?.trim() ? (
                       <img
-                        src={selectedFaculty.photoUrl}
+                        src={selectedFaculty.photoUrl.trim()}
                         alt={getLocalizedName(selectedFaculty)}
                         className="w-full h-full object-cover object-top"
                       />

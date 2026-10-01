@@ -7,7 +7,7 @@ import {
   INITIAL_ANNOUNCEMENTS, INITIAL_SUCCESS_STORIES
 } from '@/lib/alumniTypes';
 import { 
-  GraduationCap, Award, Users, Calendar, 
+  GraduationCap, User, Award, Users, Calendar, 
   Briefcase, HeartHandshake, Search, ShieldCheck, 
   Plus, CheckCircle2, QrCode, ArrowRight, Sparkles,
   MapPin, Globe, BookOpen, ExternalLink, Landmark,
@@ -268,14 +268,9 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
             id: doc.id,
             ...doc.data()
           } as AlumniProfile));
-          
-          const merged = [...liveProfiles];
-          INITIAL_ALUMNI_PROFILES.forEach(mock => {
-            if (!merged.some(p => p.alumniId === mock.alumniId)) {
-              merged.push(mock);
-            }
-          });
-          setProfiles(merged);
+          setProfiles(liveProfiles);
+        } else {
+          setProfiles([]);
         }
       }, (error) => {
         console.warn('Alumni profiles listener notice:', error?.message || error);
@@ -289,13 +284,9 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
             id: doc.id,
             ...doc.data()
           } as AlumniEvent));
-          const merged = [...liveEvents];
-          INITIAL_ALUMNI_EVENTS.forEach(mock => {
-            if (!merged.some(e => e.id === mock.id)) {
-              merged.push(mock);
-            }
-          });
-          setEvents(merged);
+          setEvents(liveEvents);
+        } else {
+          setEvents([]);
         }
       }, (error) => {
         console.warn('Alumni events listener notice:', error?.message || error);
@@ -309,13 +300,9 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
             id: doc.id,
             ...doc.data()
           } as AlumniJob));
-          const merged = [...liveJobs];
-          INITIAL_ALUMNI_JOBS.forEach(mock => {
-            if (!merged.some(j => j.id === mock.id)) {
-              merged.push(mock);
-            }
-          });
-          setJobs(merged);
+          setJobs(liveJobs);
+        } else {
+          setJobs([]);
         }
       }, (error) => {
         console.warn('Alumni jobs listener notice:', error?.message || error);
@@ -329,13 +316,9 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
             id: doc.id,
             ...doc.data()
           } as AlumniAnnouncement));
-          const merged = [...liveAnn];
-          INITIAL_ANNOUNCEMENTS.forEach(mock => {
-            if (!merged.some(a => a.id === mock.id)) {
-              merged.push(mock);
-            }
-          });
-          setAnnouncements(merged);
+          setAnnouncements(liveAnn);
+        } else {
+          setAnnouncements([]);
         }
       }, (error) => {
         console.warn('Alumni announcements listener notice:', error?.message || error);
@@ -400,10 +383,10 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
   ];
 
   const stats = [
-    { label: currentT.statRegistered, value: `${profiles.length * 40}+`, icon: GraduationCap },
-    { label: currentT.statBatches, value: '5 Batches', icon: Users },
-    { label: currentT.statCountries, value: '18+ Countries', icon: Globe },
-    { label: currentT.statMentors, value: `${profiles.filter(p => p.mentorshipOffer && p.mentorshipOffer.length > 0).length * 15}+`, icon: HeartHandshake },
+    { label: currentT.statRegistered, value: profiles.length > 0 ? `${profiles.length}` : '—', icon: GraduationCap },
+    { label: currentT.statBatches, value: 'Alumni Network', icon: Users },
+    { label: currentT.statCountries, value: 'Global Reach', icon: Globe },
+    { label: currentT.statMentors, value: `${profiles.filter(p => p.mentorshipOffer && p.mentorshipOffer.length > 0).length}`, icon: HeartHandshake },
   ];
 
   // Find active tab info
@@ -413,16 +396,8 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
   return (
     <div className="w-full space-y-0">
       
-      {/* 1. Full-Width Edge-to-Edge Hero Section with Background Image Support */}
+      {/* 1. Full-Width Edge-to-Edge Hero Section with Pure Islamic Green Design */}
       <section className="relative w-full overflow-hidden bg-[#064e3b] text-white border-b border-emerald-800">
-        
-        {/* Background Image Layer */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay scale-105 transform transition-transform duration-1000"
-          style={{ 
-            backgroundImage: `url('https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=2400&q=80')` 
-          }}
-        />
 
         {/* Deep Islamic Green Radial & Linear Gradients */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#064e3b]/98 via-[#043e2f]/92 to-[#022c22]/98" />
@@ -986,11 +961,17 @@ export function AlumniPublicPortal({ initialTab = 'about', verifyIdParam = '', l
                         </div>
 
                         <div className="flex items-start gap-4">
-                          <img
-                            src={inlineVerifyResult.photoUrl}
-                            alt={inlineVerifyResult.fullName}
-                            className="w-20 h-20 rounded-2xl object-cover border-2 border-emerald-300 shadow-xs shrink-0"
-                          />
+                          {Boolean(inlineVerifyResult.photoUrl && inlineVerifyResult.photoUrl.trim() !== '') ? (
+                            <img
+                              src={inlineVerifyResult.photoUrl.trim()}
+                              alt={inlineVerifyResult.fullName}
+                              className="w-20 h-20 rounded-2xl object-cover border-2 border-emerald-300 shadow-xs shrink-0"
+                            />
+                          ) : (
+                            <div className="w-20 h-20 rounded-2xl bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center text-emerald-800 shrink-0">
+                              <User className="w-10 h-10" />
+                            </div>
+                          )}
                           <div className="space-y-1">
                             <h3 className="text-lg font-bold font-serif text-slate-900">{inlineVerifyResult.fullName}</h3>
                             <p className="text-xs text-emerald-800 font-semibold">{inlineVerifyResult.profession}</p>
