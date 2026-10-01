@@ -47,6 +47,34 @@ interface AlumniDashboardProps {
   user: any;
 }
 
+const createDefaultProfile = (currUser?: any): AlumniProfile => ({
+  id: currUser?.uid || 'alumni-default',
+  userId: currUser?.uid || '',
+  fullName: currUser?.displayName || currUser?.name || 'Alumni Member',
+  photoUrl: currUser?.photoURL || '',
+  alumniId: 'ASDRI-ALM-2026-00001',
+  studentId: '',
+  program: 'General Islamic Studies Diploma',
+  batch: '1st Batch (2021)',
+  graduationYear: 2021,
+  email: currUser?.email || '',
+  phone: '',
+  profession: 'Islamic Researcher & Educator',
+  organization: 'As-Sunnah Dawah and Research Institute',
+  designation: 'Alumni Scholar',
+  city: 'Dhaka',
+  country: 'Bangladesh',
+  skills: ['Hadith Tahqiq', 'Arabic Translation', 'Quran Tafsir'],
+  bio: 'Dedicated graduate and scholar contributing to Islamic research, da\'wah, and community service.',
+  socialLinks: {},
+  status: 'verified',
+  privacy: 'public',
+  mentorshipOffer: ['Career & Employment Guidance'],
+  mentorshipNeed: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
+});
+
 export function AlumniDashboard({ user }: AlumniDashboardProps) {
   const searchParams = useSearchParams();
   const subtabParam = searchParams?.get('subtab') || searchParams?.get('tab');
@@ -68,7 +96,9 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
 
   // Current user's profile state
   const [profile, setProfile] = useState<AlumniProfile>(() => {
-    return INITIAL_ALUMNI_PROFILES[0];
+    return (INITIAL_ALUMNI_PROFILES && INITIAL_ALUMNI_PROFILES.length > 0)
+      ? INITIAL_ALUMNI_PROFILES[0]
+      : createDefaultProfile(user);
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -109,6 +139,8 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
           const found = merged.find(p => p.email === user?.email || p.id === user?.uid);
           if (found) {
             setProfile(found);
+          } else {
+            setProfile(prev => prev || createDefaultProfile(user));
           }
         }
       }, (err) => {
@@ -284,8 +316,8 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
           
           <div className="flex items-center gap-4">
             <img
-              src={(profile.photoUrl && profile.photoUrl.trim() !== '') ? profile.photoUrl.trim() : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
-              alt={profile.fullName}
+              src={(profile?.photoUrl && profile.photoUrl.trim() !== '') ? profile.photoUrl.trim() : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80'}
+              alt={profile?.fullName || 'Alumni Member'}
               className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-amber-400/80 shadow-md"
             />
             <div className="space-y-1">
@@ -295,17 +327,17 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
                   Verified Alumni
                 </span>
                 <span className="text-[10px] font-mono text-amber-300 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-700">
-                  {profile.batch}
+                  {profile?.batch || '1st Batch (2021)'}
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-bold font-serif text-white">
-                {profile.fullName}
+                {profile?.fullName || 'Alumni Member'}
               </h1>
               <p className="text-xs text-amber-300 font-semibold">
-                {profile.profession} • {profile.organization || 'As-Sunnah Institute'}
+                {profile?.profession || 'Islamic Scholar'} • {profile?.organization || 'As-Sunnah Institute'}
               </p>
               <p className="text-[11px] font-mono text-emerald-200">
-                Alumni ID: <strong className="text-white">{profile.alumniId}</strong>
+                Alumni ID: <strong className="text-white">{profile?.alumniId || 'ASDRI-ALM-2026-00001'}</strong>
               </p>
             </div>
           </div>
@@ -414,7 +446,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.fullName}
+                value={profile?.fullName || ''}
                 onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 disabled:bg-slate-100/70"
               />
@@ -425,7 +457,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.profession}
+                value={profile?.profession || ''}
                 onChange={(e) => setProfile({ ...profile, profession: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 disabled:bg-slate-100/70"
               />
@@ -436,7 +468,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.organization}
+                value={profile?.organization || ''}
                 onChange={(e) => setProfile({ ...profile, organization: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 disabled:bg-slate-100/70"
               />
@@ -448,7 +480,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
                 <input
                   type="text"
                   disabled={!isEditing}
-                  value={profile.city}
+                  value={profile?.city || ''}
                   onChange={(e) => setProfile({ ...profile, city: e.target.value })}
                   placeholder="City"
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 disabled:bg-slate-100/70"
@@ -456,7 +488,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
                 <input
                   type="text"
                   disabled={!isEditing}
-                  value={profile.country}
+                  value={profile?.country || ''}
                   onChange={(e) => setProfile({ ...profile, country: e.target.value })}
                   placeholder="Country"
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 disabled:bg-slate-100/70"
@@ -469,7 +501,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
               <textarea
                 rows={3}
                 disabled={!isEditing}
-                value={profile.bio}
+                value={profile?.bio || ''}
                 onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 disabled:bg-slate-100/70 resize-none"
               />
@@ -730,7 +762,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
                   type="button"
                   onClick={() => setProfile({ ...profile, privacy: 'public' })}
                   className={`p-4 rounded-2xl border text-left cursor-pointer transition-all ${
-                    profile.privacy === 'public'
+                    profile?.privacy === 'public'
                       ? 'border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-600/20'
                       : 'border-slate-200 bg-white hover:bg-slate-50'
                   }`}
@@ -746,7 +778,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
                   type="button"
                   onClick={() => setProfile({ ...profile, privacy: 'alumni_only' })}
                   className={`p-4 rounded-2xl border text-left cursor-pointer transition-all ${
-                    profile.privacy === 'alumni_only'
+                    profile?.privacy === 'alumni_only'
                       ? 'border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-600/20'
                       : 'border-slate-200 bg-white hover:bg-slate-50'
                   }`}
@@ -762,7 +794,7 @@ export function AlumniDashboard({ user }: AlumniDashboardProps) {
                   type="button"
                   onClick={() => setProfile({ ...profile, privacy: 'private' })}
                   className={`p-4 rounded-2xl border text-left cursor-pointer transition-all ${
-                    profile.privacy === 'private'
+                    profile?.privacy === 'private'
                       ? 'border-emerald-600 bg-emerald-50/50 ring-2 ring-emerald-600/20'
                       : 'border-slate-200 bg-white hover:bg-slate-50'
                   }`}

@@ -16,10 +16,12 @@ interface DigitalAlumniCardProps {
 export function DigitalAlumniCard({ profile, showActions = true }: DigitalAlumniCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  if (!profile) return null;
+
   // Generate public verification link
   const verificationUrl = typeof window !== 'undefined' 
-    ? `${window.location.origin}/alumni?verifyId=${encodeURIComponent(profile.alumniId)}`
-    : `https://asdri.edu.bd/alumni?verifyId=${encodeURIComponent(profile.alumniId)}`;
+    ? `${window.location.origin}/alumni?verifyId=${encodeURIComponent(profile?.alumniId || '')}`
+    : `https://asdri.edu.bd/alumni?verifyId=${encodeURIComponent(profile?.alumniId || '')}`;
 
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(verificationUrl)}&color=064e3b&bgcolor=ffffff`;
 

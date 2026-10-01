@@ -4,7 +4,7 @@ import { getDictionary, Locale } from '@/lib/dictionary';
 import { fetchCourseById, fetchAllCourses } from '@/lib/coursesData';
 import { CourseDetailClientView } from '@/components/CourseDetailClientView';
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const locales: Locale[] = ['en', 'bn', 'ar'];

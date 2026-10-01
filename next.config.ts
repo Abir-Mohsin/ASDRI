@@ -5,7 +5,6 @@ if (process.argv.some((arg) => arg.includes('build'))) {
 }
 
 const nextConfig: NextConfig = {
-  output: 'export',
   reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: false,
