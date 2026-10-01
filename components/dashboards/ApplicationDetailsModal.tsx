@@ -1,5 +1,7 @@
-import React from 'react';
-import { X } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Printer, FileText, HeartHandshake } from 'lucide-react';
+import AdmissionFormPdfModal from '@/components/dashboards/AdmissionFormPdfModal';
+import ZakatFormPdfModal from '@/components/dashboards/ZakatFormPdfModal';
 
 interface ApplicationDetailsModalProps {
   application: any;
@@ -7,21 +9,48 @@ interface ApplicationDetailsModalProps {
 }
 
 export default function ApplicationDetailsModal({ application, onClose }: ApplicationDetailsModalProps) {
+  const [showAdmissionPdf, setShowAdmissionPdf] = useState(false);
+  const [showZakatPdf, setShowZakatPdf] = useState(false);
+
+  const hasZakat = application.hasZakatAssessment || application.zakatAssessment || application.fundingOption === 'scholarship_zakat' || application.zakatFundStatus;
+
   return (
     <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
       <div className="bg-white rounded-2xl max-w-2xl w-full border border-slate-100 shadow-2xl flex flex-col max-h-[90vh] animate-slideIn">
         <div className="p-5 border-b border-slate-100 flex justify-between items-start bg-slate-50 rounded-t-2xl">
           <div>
             <h3 className="text-base font-bold text-slate-950 font-serif">
-              Application Details
+              Application Details • আবেদন বিবরণী
             </h3>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Applicant information and submitted form data.
+              Applicant information, financial options and submitted form data.
             </p>
           </div>
-          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-700 bg-white border border-slate-200 rounded-md transition-colors">
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowAdmissionPdf(true)}
+              className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-xs font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+              title="Print Admission Form"
+            >
+              <FileText className="w-3.5 h-3.5 text-emerald-700" />
+              <span>ভর্তি ফরম</span>
+            </button>
+            {hasZakat && (
+              <button
+                type="button"
+                onClick={() => setShowZakatPdf(true)}
+                className="px-2.5 py-1.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-black rounded-lg transition-colors flex items-center gap-1 cursor-pointer border border-amber-400 shadow-2xs"
+                title="Print Zakat Form"
+              >
+                <HeartHandshake className="w-3.5 h-3.5 text-slate-950" />
+                <span>যাকাত ফরম</span>
+              </button>
+            )}
+            <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-700 bg-white border border-slate-200 rounded-md transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
         
         <div className="p-6 overflow-y-auto space-y-6">
@@ -59,14 +88,21 @@ export default function ApplicationDetailsModal({ application, onClose }: Applic
           </div>
 
           {/* Zakat Assessment Details */}
-          {application.hasZakatAssessment && application.zakatAssessment && (
+          {hasZakat && application.zakatAssessment && (
             <div className="bg-amber-50/70 p-4 rounded-xl border border-amber-200 space-y-3">
-              <h4 className="text-xs font-bold text-amber-950 uppercase tracking-wide border-b border-amber-200 pb-1.5 flex items-center justify-between">
-                <span>Zakat & Scholarship Assessment Form</span>
-                <span className="text-[10px] font-extrabold bg-amber-200 text-amber-900 px-2 py-0.5 rounded">
-                  Zakat Requested
-                </span>
-              </h4>
+              <div className="flex flex-wrap items-center justify-between border-b border-amber-200 pb-2 gap-2">
+                <h4 className="text-xs font-bold text-amber-950 uppercase tracking-wide">
+                  Zakat & Scholarship Assessment Form • যাকাত ও স্কলারশিপ ফরম
+                </h4>
+                <button
+                  type="button"
+                  onClick={() => setShowZakatPdf(true)}
+                  className="px-2.5 py-1 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-[11px] rounded-md transition-colors flex items-center gap-1 shadow-2xs border border-amber-400 cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>যাকাত ফরম প্রিন্ট (PDF)</span>
+                </button>
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 {Object.entries(application.zakatAssessment).map(([key, value]: [string, any]) => (
@@ -115,6 +151,20 @@ export default function ApplicationDetailsModal({ application, onClose }: Applic
             </div>
           )}
         </div>
+
+        {/* Modals */}
+        {showAdmissionPdf && (
+          <AdmissionFormPdfModal
+            application={application}
+            onClose={() => setShowAdmissionPdf(false)}
+          />
+        )}
+        {showZakatPdf && (
+          <ZakatFormPdfModal
+            application={application}
+            onClose={() => setShowZakatPdf(false)}
+          />
+        )}
       </div>
     </div>
   );

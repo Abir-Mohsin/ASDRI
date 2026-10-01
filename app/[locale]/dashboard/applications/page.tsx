@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import ApplicationDetailsModal from '@/components/dashboards/ApplicationDetailsModal';
 import AdmissionFormPdfModal from '@/components/dashboards/AdmissionFormPdfModal';
+import ZakatFormPdfModal from '@/components/dashboards/ZakatFormPdfModal';
 
 export default function AdminApplicationsPage() {
   const { role } = useAuthStore();
@@ -22,6 +23,7 @@ export default function AdminApplicationsPage() {
   const [filterStatus, setFilterStatus] = useState('all'); // all, pending, approved, rejected, zakat
   const [selectedApp, setSelectedApp] = useState<any | null>(null);
   const [pdfApp, setPdfApp] = useState<any | null>(null);
+  const [pdfZakatApp, setPdfZakatApp] = useState<any | null>(null);
   const [zakatReviewApp, setZakatReviewApp] = useState<any | null>(null);
 
   // Keep track of selected roles to assign upon approval
@@ -296,10 +298,19 @@ export default function AdminApplicationsPage() {
                       <button
                         onClick={() => setPdfApp(app)}
                         className="p-1.5 text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-md transition-colors"
-                        title="Download PDF Form"
+                        title="Download / Print Admission Form (ভর্তি ফরম প্রিন্ট)"
                       >
                         <FileText className="w-4 h-4" />
                       </button>
+                      {(app.zakatAssessment || app.hasZakatAssessment || app.fundingOption === 'scholarship_zakat' || app.zakatFundStatus) && (
+                        <button
+                          onClick={() => setPdfZakatApp(app)}
+                          className="p-1.5 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-md transition-colors"
+                          title="Download / Print Zakat Assessment Form (যাকাত ফরম প্রিন্ট)"
+                        >
+                          <HeartHandshake className="w-4 h-4" />
+                        </button>
+                      )}
                       <button 
                         onClick={() => setSelectedApp(app)}
                         className="p-1.5 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
@@ -392,7 +403,18 @@ export default function AdminApplicationsPage() {
               </div>
             </div>
 
-            <div className="space-y-2 pt-2">
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setPdfZakatApp(zakatReviewApp)}
+                className="w-full py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
+              >
+                <HeartHandshake className="w-4 h-4 text-emerald-950" />
+                <span>Print Official Zakat Form (PDF) • যাকাত মূল্যায়ন ফরম প্রিন্ট</span>
+              </button>
+            </div>
+
+            <div className="space-y-2 pt-2 border-t border-slate-100">
               <p className="font-bold text-slate-800">Admin Decision Options:</p>
               
               <div className="grid grid-cols-1 gap-2">
@@ -413,6 +435,14 @@ export default function AdminApplicationsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* PDF Zakat Assessment Form Modal */}
+      {pdfZakatApp && (
+        <ZakatFormPdfModal
+          application={pdfZakatApp}
+          onClose={() => setPdfZakatApp(null)}
+        />
       )}
     </div>
   );

@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/useAuthStore';
 import { collection, addDoc, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '@/lib/firebase';
-import { CheckCircle2, ChevronLeft, GraduationCap, Wallet, Award, ArrowRight, RefreshCw } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, GraduationCap, Wallet, Award, ArrowRight, RefreshCw, Printer, FileText, HeartHandshake } from 'lucide-react';
 import Link from 'next/link';
 
 import { COURSES, getLocalizedCourse } from '@/lib/constants/courses';
@@ -13,6 +13,8 @@ import DynamicFormRenderer from '@/components/dashboards/DynamicFormRenderer';
 import { defaultAdmissionFields } from '@/components/dashboards/FormBuilder';
 import ZakatFormRenderer from '@/components/dashboards/ZakatFormRenderer';
 import { DEFAULT_ZAKAT_FORM_FIELDS } from '@/lib/constants/zakatFormTemplate';
+import AdmissionFormPdfModal from '@/components/dashboards/AdmissionFormPdfModal';
+import ZakatFormPdfModal from '@/components/dashboards/ZakatFormPdfModal';
 
 enum OperationType {
   CREATE = 'create',
@@ -39,6 +41,9 @@ export default function ApplyPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submittedApp, setSubmittedApp] = useState<any | null>(null);
+  const [showAdmissionPdf, setShowAdmissionPdf] = useState(false);
+  const [showZakatPdf, setShowZakatPdf] = useState(false);
 
   const [dbCourses, setDbCourses] = useState<any[]>([]);
   const [isLoadingCourses, setIsLoadingCourses] = useState(true);
@@ -303,11 +308,9 @@ export default function ApplyPage() {
         applicationPayload.zakatAssessment = zakatFormData;
       }
 
-      await addDoc(collection(db, 'applications'), applicationPayload);
+      const docRef = await addDoc(collection(db, 'applications'), applicationPayload);
+      setSubmittedApp({ id: docRef.id, ...applicationPayload });
       setIsSuccess(true);
-      setTimeout(() => {
-        router.push(`/${locale}/dashboard`);
-      }, 3000);
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'applications');
     } finally {
@@ -315,17 +318,111 @@ export default function ApplyPage() {
     }
   };
 
-  if (isSuccess) {
+  if (isSuccess && submittedApp) {
+    const isZakat = submittedApp.fundingOption === 'scholarship_zakat' || submittedApp.hasZakatAssessment || submittedApp.zakatAssessment;
     return (
-      <div className="max-w-2xl mx-auto mt-12 bg-white p-8 rounded-2xl border border-emerald-100 shadow-xl text-center space-y-4">
-        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-          <CheckCircle2 className="w-8 h-8 text-[#064e3b]" />
+      <div className="max-w-2xl mx-auto my-10 bg-white p-8 sm:p-10 rounded-3xl border border-emerald-100 shadow-2xl text-center space-y-6">
+        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-600 shadow-inner">
+          <CheckCircle2 className="w-9 h-9 text-[#064e3b]" />
         </div>
-        <h2 className="text-2xl font-bold font-serif text-slate-900">{t('successTitle')}</h2>
-        <p className="text-slate-600 text-sm leading-relaxed max-w-md mx-auto">
-          {t('successDesc')}
-        </p>
-        <p className="text-xs text-slate-400">{t('redirecting')}</p>
+
+        <div className="space-y-2">
+          <span className="text-[11px] font-extrabold uppercase tracking-widest bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-full">
+            {locale === 'bn' ? 'আবেদন সংরক্ষিত হয়েছে' : locale === 'ar' ? 'تم تسجيل الطلب بنجاح' : 'Application Recorded'}
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-extrabold font-serif text-slate-900 mt-2">
+            {t('successTitle')}
+          </h2>
+          <p className="text-slate-600 text-sm leading-relaxed max-w-lg mx-auto">
+            {t('successDesc')}
+          </p>
+        </div>
+
+        {/* Applied Course & Serial info card */}
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left space-y-2 text-xs">
+          <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+            <span className="text-slate-500 font-semibold">{locale === 'bn' ? 'আবেদন সিরিয়াল নম্বর' : 'Application Serial:'}</span>
+            <span className="font-mono font-bold text-emerald-950 bg-white px-2 py-0.5 rounded border border-slate-200">
+              ASDRI-{submittedApp.id?.slice(0, 8).toUpperCase()}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500 font-semibold">{locale === 'bn' ? 'নির্বাচিত প্রোগ্রাম' : 'Program:'}</span>
+            <span className="font-bold text-slate-900">{submittedApp.courseTitle}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-slate-500 font-semibold">{locale === 'bn' ? 'আবেদনের ধরণ' : 'Type:'}</span>
+            <span className="font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+              {isZakat ? (locale === 'bn' ? 'স্কলারশিপ / যাকাত ফান্ড আবেদন' : 'Scholarship / Zakat Applicant') : (locale === 'bn' ? 'স্ব-অর্থায়নে সাধারণ ভর্তি' : 'Regular Admission')}
+            </span>
+          </div>
+        </div>
+
+        {/* Printable Documents Section */}
+        <div className="bg-emerald-950 text-white rounded-2xl p-5 text-left space-y-3.5 shadow-md">
+          <div className="flex items-center gap-2">
+            <Printer className="w-5 h-5 text-amber-400" />
+            <div>
+              <h4 className="text-sm font-bold text-amber-200 font-serif">
+                {locale === 'bn' ? 'ফরম প্রিন্ট ও সংরক্ষণ করুন' : locale === 'ar' ? 'طباعة وحفظ الاستمارات' : 'Print & Download Forms'}
+              </h4>
+              <p className="text-[11px] text-emerald-200">
+                {locale === 'bn' 
+                  ? 'আপনার দাখিলকৃত তথ্যাবলী প্রাতিষ্ঠানিক ফরম্যাটে প্রিন্ট অথবা PDF আকারে সংরক্ষণ করতে পারবেন:' 
+                  : 'You can print or download your submitted admission and assessment records:'}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            {/* Button 1: Admission Form PDF */}
+            <button
+              type="button"
+              onClick={() => setShowAdmissionPdf(true)}
+              className="w-full py-3 px-4 bg-white hover:bg-slate-100 text-emerald-950 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer border border-emerald-200"
+            >
+              <FileText className="w-4 h-4 text-emerald-800" />
+              <span>{locale === 'bn' ? '📄 ভর্তি ফরম প্রিন্ট (PDF)' : locale === 'ar' ? 'طباعة استمارة الالتحاق' : 'Print Admission Form'}</span>
+            </button>
+
+            {/* Button 2: Zakat Form PDF */}
+            {isZakat && (
+              <button
+                type="button"
+                onClick={() => setShowZakatPdf(true)}
+                className="w-full py-3 px-4 bg-amber-400 hover:bg-amber-500 text-slate-950 font-extrabold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer border border-amber-300"
+              >
+                <HeartHandshake className="w-4 h-4 text-emerald-950" />
+                <span>{locale === 'bn' ? '🤝 যাকাত ফরম প্রিন্ট (PDF)' : locale === 'ar' ? 'طباعة استمارة الزكاة' : 'Print Zakat Form (PDF)'}</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Dashboard button */}
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => router.push(`/${locale}/dashboard`)}
+            className="w-full py-3 px-6 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>{locale === 'bn' ? 'ড্যাশবোর্ডে প্রবেশ করুন →' : locale === 'ar' ? 'الانتقال إلى لوحة التحكم ←' : 'Go to Dashboard →'}</span>
+          </button>
+        </div>
+
+        {/* Modals */}
+        {showAdmissionPdf && (
+          <AdmissionFormPdfModal
+            application={submittedApp}
+            onClose={() => setShowAdmissionPdf(false)}
+          />
+        )}
+        {showZakatPdf && (
+          <ZakatFormPdfModal
+            application={submittedApp}
+            onClose={() => setShowZakatPdf(false)}
+          />
+        )}
       </div>
     );
   }

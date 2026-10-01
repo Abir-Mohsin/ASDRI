@@ -15,6 +15,7 @@ import { COURSES, getLocalizedCourse } from '@/lib/constants/courses';
 import { StudentDashboard } from '@/components/dashboards/StudentDashboard';
 import ZakatAssessmentModal from '@/components/dashboards/ZakatAssessmentModal';
 import AdmissionFormPdfModal from '@/components/dashboards/AdmissionFormPdfModal';
+import ZakatFormPdfModal from '@/components/dashboards/ZakatFormPdfModal';
 
 export function ApplicantDashboard() {
   const { user, role } = useAuthStore();
@@ -29,6 +30,7 @@ export function ApplicantDashboard() {
   // Modals state
   const [showZakatModal, setShowZakatModal] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
+  const [showZakatPdfModal, setShowZakatPdfModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showStudentView, setShowStudentView] = useState(false);
 
@@ -413,13 +415,21 @@ export function ApplicantDashboard() {
               <div className="flex flex-wrap gap-2.5">
                 <button
                   onClick={() => setShowPdfModal(true)}
-                  className="px-4 py-2.5 bg-emerald-800/90 hover:bg-emerald-800 text-amber-300 font-bold text-xs rounded-xl transition-colors border border-emerald-700 flex items-center gap-2 shadow-sm"
+                  className="px-4 py-2.5 bg-emerald-800/90 hover:bg-emerald-800 text-amber-300 font-bold text-xs rounded-xl transition-colors border border-emerald-700 flex items-center gap-2 shadow-sm cursor-pointer"
                 >
                   <FileText className="w-4 h-4 text-amber-400" /> {t('downloadPdfBtn')}
                 </button>
+                {(application?.zakatAssessment || application?.hasZakatAssessment || application?.zakatFundStatus) && (
+                  <button
+                    onClick={() => setShowZakatPdfModal(true)}
+                    className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    <HeartHandshake className="w-4 h-4 text-emerald-950" /> {locale === 'bn' ? 'যাকাত ফরম প্রিন্ট' : locale === 'ar' ? 'طباعة استمارة الزكاة' : 'Print Zakat Form'}
+                  </button>
+                )}
                 <button
                   onClick={() => setShowStudentView(true)}
-                  className="px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black text-xs rounded-xl transition-colors flex items-center gap-2 shadow-md"
+                  className="px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black text-xs rounded-xl transition-colors flex items-center gap-2 shadow-md cursor-pointer"
                 >
                   <BookOpen className="w-4 h-4" /> {t('enterClassroomBtn')}
                 </button>
@@ -468,6 +478,13 @@ export function ApplicantDashboard() {
                       <p className="text-[11px] text-emerald-200 leading-relaxed">
                         {t('zakatApprovedDesc')}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => setShowZakatPdfModal(true)}
+                        className="pt-1 text-xs font-bold text-amber-300 hover:text-amber-100 underline flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Printer className="w-3.5 h-3.5" /> {locale === 'bn' ? 'যাকাত আবেদন কপি প্রিন্ট / ডাউনলোড করুন' : 'Print / Download Zakat Form PDF'}
+                      </button>
                     </div>
                   ) : application?.zakatFundStatus === 'approved_general' ? (
                     <div className="mt-2 bg-blue-400/20 border border-blue-400/40 p-3.5 rounded-xl text-xs text-blue-200 space-y-1">
@@ -477,6 +494,13 @@ export function ApplicantDashboard() {
                       <p className="text-[11px] text-emerald-200 leading-relaxed">
                         {t('generalApprovedDesc')}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => setShowZakatPdfModal(true)}
+                        className="pt-1 text-xs font-bold text-blue-200 hover:text-white underline flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Printer className="w-3.5 h-3.5" /> {locale === 'bn' ? 'স্কলারশিপ আবেদন কপি প্রিন্ট' : 'Print Scholarship Form PDF'}
+                      </button>
                     </div>
                   ) : application?.zakatFundStatus === 'pending_review' ? (
                     <div className="mt-2 bg-amber-500/20 border border-amber-500/40 p-3.5 rounded-xl text-xs text-amber-200 space-y-1">
@@ -486,6 +510,13 @@ export function ApplicantDashboard() {
                       <p className="text-[11px] text-emerald-200 leading-relaxed">
                         {t('zakatPendingDesc')}
                       </p>
+                      <button
+                        type="button"
+                        onClick={() => setShowZakatPdfModal(true)}
+                        className="pt-1 text-xs font-bold text-amber-300 hover:text-amber-100 underline flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Printer className="w-3.5 h-3.5" /> {locale === 'bn' ? 'দাখিলকৃত যাকাত ফরম প্রিন্ট / প্রিভিউ' : 'Print / Preview Submitted Zakat Form'}
+                      </button>
                     </div>
                   ) : application?.paymentStatus === 'paid' ? (
                     <div className="mt-2 bg-emerald-800/80 border border-emerald-600 p-3.5 rounded-xl text-xs text-emerald-100 space-y-1">
@@ -518,6 +549,88 @@ export function ApplicantDashboard() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PENDING / UNDER REVIEW APPLICATION CARD */}
+      {application && application.status !== 'approved' && enrollments.length === 0 && (
+        <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-200/90 relative overflow-hidden space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-wider bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1 rounded-full flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  {application.status === 'rejected' ? (locale === 'bn' ? 'আবেদন বাতিল' : 'Rejected') : (locale === 'bn' ? 'আবেদন জমা হয়েছে • পর্যালোচনাধীন' : 'Application Submitted • Under Review')}
+                </span>
+                <span className="text-slate-400 text-xs font-mono">
+                  ASDRI-{application.id?.slice(0, 8).toUpperCase()}
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-extrabold text-[#064e3b] font-serif mt-2 leading-tight">
+                {matchedCourse?.title}
+              </h3>
+              <p className="text-xs text-slate-500 mt-1 font-medium">
+                {locale === 'bn' ? 'আবেদনের তারিখ:' : 'Applied Date:'} {application.createdAt ? new Date(application.createdAt).toLocaleDateString() : 'N/A'} • {matchedCourse?.duration} ({matchedCourse?.type})
+              </p>
+            </div>
+
+            {/* Print Buttons for pending applications */}
+            <div className="flex flex-wrap gap-2.5">
+              <button
+                type="button"
+                onClick={() => setShowPdfModal(true)}
+                className="px-4 py-2.5 bg-emerald-900 hover:bg-emerald-950 text-amber-300 font-bold text-xs rounded-xl transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+              >
+                <FileText className="w-4 h-4 text-amber-400" />
+                <span>{locale === 'bn' ? 'ভর্তি ফরম প্রিন্ট (PDF)' : locale === 'ar' ? 'طباعة استمارة الالتحاق' : 'Print Admission Form'}</span>
+              </button>
+
+              {(application?.zakatAssessment || application?.hasZakatAssessment || application?.fundingOption === 'scholarship_zakat' || application?.zakatFundStatus) && (
+                <button
+                  type="button"
+                  onClick={() => setShowZakatPdfModal(true)}
+                  className="px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-emerald-950 font-black text-xs rounded-xl transition-colors flex items-center gap-2 shadow-xs cursor-pointer border border-amber-300"
+                >
+                  <HeartHandshake className="w-4 h-4 text-emerald-950" />
+                  <span>{locale === 'bn' ? 'যাকাত ফরম প্রিন্ট (PDF)' : locale === 'ar' ? 'طباعة استمارة الزكاة' : 'Print Zakat Form'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Additional details row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 text-xs space-y-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                {locale === 'bn' ? 'আবেদনের ধরণ ও ফি' : 'Funding & Fee Status'}
+              </span>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-600">{locale === 'bn' ? 'অর্থায়ন বিকল্প:' : 'Funding Track:'}</span>
+                <span className="font-bold text-slate-900">
+                  {(application.fundingOption === 'scholarship_zakat' || application.hasZakatAssessment) 
+                    ? (locale === 'bn' ? 'যাকাত / স্কলারশিপ ফান্ড আবেদন' : 'Zakat / Scholarship Fund') 
+                    : (locale === 'bn' ? 'সাধারণ ফি পরিশোধ' : 'Standard Self-Payment')}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-600">{locale === 'bn' ? 'মোট কোর্স ফি:' : 'Total Course Fee:'}</span>
+                <span className="font-bold text-[#064e3b]">
+                  {matchedCourse.fees?.isFree ? (locale === 'bn' ? 'ফ্রি' : 'Free') : `৳ ${matchedCourse.fees?.totalFee || 0}`}
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-emerald-50/60 rounded-2xl p-4 border border-emerald-100 text-xs space-y-2">
+              <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
+                {locale === 'bn' ? 'যাচাই-বাছাই অগ্রগতি' : 'Evaluation Progress'}
+              </span>
+              <p className="text-slate-700 leading-relaxed text-[11px]">
+                {locale === 'bn' 
+                  ? 'আপনার আবেদনপত্রটি একাডেমিক মূল্যায়ন বোর্ড এবং যাকাত মূল্যায়ন কমিটির সক্রিয় পর্যালোচনায় রয়েছে। পর্যালোচনার যেকোনো মুহূর্তে আপনি আপনার ভর্তি ফরম এবং পূরণকৃত যাকাত ফরম ডাউনলোড বা প্রিন্ট করে সংরক্ষণ করতে পারেন।'
+                  : 'Your application is under active review by the academic board and zakat committee. You can print or download your forms anytime.'}
+              </p>
             </div>
           </div>
         </div>
@@ -621,6 +734,28 @@ export function ApplicantDashboard() {
                       ? t('rejectedDesc')
                       : t('reviewPendingDesc')}
                   </p>
+                  {application && (
+                    <div className="mt-3 pt-3 border-t border-emerald-800/70 space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowPdfModal(true)}
+                        className="w-full py-1.5 px-3 bg-white/10 hover:bg-white/20 text-amber-300 font-bold text-[11px] rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>{locale === 'bn' ? 'ভর্তি ফরম প্রিন্ট (PDF)' : 'Print Admission Form'}</span>
+                      </button>
+                      {(application?.zakatAssessment || application?.hasZakatAssessment || application?.fundingOption === 'scholarship_zakat' || application?.zakatFundStatus) && (
+                        <button
+                          type="button"
+                          onClick={() => setShowZakatPdfModal(true)}
+                          className="w-full py-1.5 px-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-[11px] rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <HeartHandshake className="w-3.5 h-3.5 text-slate-950" />
+                          <span>{locale === 'bn' ? 'যাকাত ফরম প্রিন্ট (PDF)' : 'Print Zakat Form'}</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </>
               ) : (
                 <>
@@ -771,6 +906,14 @@ export function ApplicantDashboard() {
         <AdmissionFormPdfModal
           application={application}
           onClose={() => setShowPdfModal(false)}
+        />
+      )}
+
+      {/* PDF Zakat Assessment Form Modal */}
+      {showZakatPdfModal && (
+        <ZakatFormPdfModal
+          application={application}
+          onClose={() => setShowZakatPdfModal(false)}
         />
       )}
     </div>

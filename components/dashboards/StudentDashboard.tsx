@@ -5,7 +5,8 @@ import { useAuthStore } from '@/lib/store/useAuthStore';
 import { 
   BookOpen, Calendar as CalendarIcon, Users, TrendingUp, Clock, 
   FileText, Link2, Download, CheckCircle2, AlertCircle, Send, Award,
-  Book, Search, Bookmark, Video, UploadCloud, ExternalLink, Trash2, Paperclip
+  Book, Search, Bookmark, Video, UploadCloud, ExternalLink, Trash2, Paperclip,
+  Printer, HeartHandshake
 } from 'lucide-react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { COURSES } from '@/lib/constants/courses';
@@ -15,6 +16,8 @@ import {
 import { db } from '@/lib/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebase";
+import AdmissionFormPdfModal from '@/components/dashboards/AdmissionFormPdfModal';
+import ZakatFormPdfModal from '@/components/dashboards/ZakatFormPdfModal';
 
 enum OperationType {
   CREATE = 'create',
@@ -53,6 +56,11 @@ export function StudentDashboard() {
 
   // Certificate Modal State
   const [showCertificate, setShowCertificate] = useState(false);
+
+  // Application & Forms Print States
+  const [studentApplication, setStudentApplication] = useState<any | null>(null);
+  const [showAdmissionPdf, setShowAdmissionPdf] = useState(false);
+  const [showZakatPdf, setShowZakatPdf] = useState(false);
   
   const [isLoading, setIsLoading] = useState(true);
   const [selectedEnrollmentId, setSelectedEnrollmentId] = useState<string>('');
@@ -131,6 +139,33 @@ export function StudentDashboard() {
         const enrollSnap = await getDocs(enrollQuery);
         const enrollList: any[] = enrollSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setEnrollments(enrollList);
+
+        // Fetch User's Application Records (for printing Admission & Zakat Forms)
+        try {
+          const appQuery = query(collection(db, 'applications'), where('userId', '==', user.uid));
+          const appSnap = await getDocs(appQuery);
+          if (!appSnap.empty) {
+            const apps = appSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            apps.sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+            setStudentApplication(apps[0]);
+          } else if (enrollList.length > 0) {
+            // Fallback student application record from enrollment so the student can always print their admission form
+            const firstEnroll = enrollList[0];
+            setStudentApplication({
+              id: firstEnroll.id,
+              userId: user.uid,
+              userName: user.displayName || firstEnroll.studentName || 'Student',
+              userEmail: user.email || firstEnroll.studentEmail || '',
+              courseId: firstEnroll.courseId,
+              courseTitle: getCourseTitle(firstEnroll.courseId),
+              createdAt: firstEnroll.enrolledAt || new Date().toISOString(),
+              status: 'approved',
+              assignedRole: 'student'
+            });
+          }
+        } catch (appErr) {
+          console.error("Error fetching student application records:", appErr);
+        }
 
         if (enrollList.length > 0) {
           // Default to first enrollment if not set
@@ -482,6 +517,30 @@ export function StudentDashboard() {
               <Video className="w-4 h-4" />
               Online Classroom
             </button>
+
+            {studentApplication && (
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setShowAdmissionPdf(true)}
+                  className="px-3.5 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-xs font-bold rounded-2xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                  title="Print Admission Form"
+                >
+                  <FileText className="w-4 h-4 text-emerald-700" />
+                  <span>{locale === 'bn' ? 'ভর্তি ফরম প্রিন্ট' : 'Admission Form'}</span>
+                </button>
+
+                {(studentApplication.zakatAssessment || studentApplication.hasZakatAssessment || studentApplication.fundingOption === 'scholarship_zakat' || studentApplication.zakatFundStatus) && (
+                  <button 
+                    onClick={() => setShowZakatPdf(true)}
+                    className="px-3.5 py-2.5 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-black rounded-2xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border border-amber-400"
+                    title="Print Zakat Form"
+                  >
+                    <HeartHandshake className="w-4 h-4 text-slate-950" />
+                    <span>{locale === 'bn' ? 'যাকাত ফরম প্রিন্ট' : 'Zakat Form'}</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -630,6 +689,44 @@ export function StudentDashboard() {
                           )}
                         </div>
                       </div>
+
+                      {studentApplication && (
+                        <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-emerald-950 text-white p-4.5 rounded-xl">
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
+                              {locale === 'bn' ? 'প্রাতিষ্ঠানিক ভর্তি ও স্কলারশিপ রেকর্ড' : 'Official Academic & Scholarship Records'}
+                            </span>
+                            <h4 className="text-sm font-bold text-white mt-0.5">
+                              {locale === 'bn' ? 'অফিসিয়াল ভর্তি ফরম ও মূল্যায়ন ডকুমেন্টস' : 'Official Admission & Assessment Documents'}
+                            </h4>
+                            <p className="text-[11px] text-emerald-200 mt-0.5">
+                              {locale === 'bn' ? 'ভর্তির সময় জমাকৃত তথ্যের প্রামাণ্য কপি যেকোনো সময় প্রিন্ট বা ডাউনলোড করুন।' : 'Print or download your official admission and scholarship verification copies.'}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setShowAdmissionPdf(true)}
+                              className="px-3.5 py-2 bg-white hover:bg-slate-100 text-emerald-950 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-emerald-800" />
+                              <span>{locale === 'bn' ? 'ভর্তি ফরম (PDF)' : 'Admission Form'}</span>
+                            </button>
+
+                            {(studentApplication.zakatAssessment || studentApplication.hasZakatAssessment || studentApplication.fundingOption === 'scholarship_zakat' || studentApplication.zakatFundStatus) && (
+                              <button
+                                type="button"
+                                onClick={() => setShowZakatPdf(true)}
+                                className="px-3.5 py-2 bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-black rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs border border-amber-300"
+                              >
+                                <HeartHandshake className="w-3.5 h-3.5 text-slate-950" />
+                                <span>{locale === 'bn' ? 'যাকাত ফরম (PDF)' : 'Zakat Form (PDF)'}</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Pending Assignments */}
@@ -1517,32 +1614,50 @@ export function StudentDashboard() {
         </div>
       )}
 
-      {/* Print styles */}
-      <style>{`
-        @media print {
-          body * {
-            visibility: hidden !important;
+      {/* Admission Form PDF Modal */}
+      {showAdmissionPdf && studentApplication && (
+        <AdmissionFormPdfModal
+          application={studentApplication}
+          onClose={() => setShowAdmissionPdf(false)}
+        />
+      )}
+
+      {/* Zakat Form PDF Modal */}
+      {showZakatPdf && studentApplication && (
+        <ZakatFormPdfModal
+          application={studentApplication}
+          onClose={() => setShowZakatPdf(false)}
+        />
+      )}
+
+      {/* Print styles for certificate modal */}
+      {showCertificate && (
+        <style>{`
+          @media print {
+            body * {
+              visibility: hidden !important;
+            }
+            .no-print, .no-print * {
+              display: none !important;
+            }
+            #printable-certificate, #printable-certificate * {
+              visibility: visible !important;
+            }
+            #printable-certificate {
+              position: absolute !important;
+              left: 0 !important;
+              top: 0 !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              margin: 0 !important;
+              padding: 2rem !important;
+              border: 8px double #b45309 !important;
+              box-shadow: none !important;
+              z-index: 9999 !important;
+            }
           }
-          .no-print, .no-print * {
-            display: none !important;
-          }
-          #printable-certificate, #printable-certificate * {
-            visibility: visible !important;
-          }
-          #printable-certificate {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 2rem !important;
-            border: 8px double #b45309 !important;
-            box-shadow: none !important;
-            z-index: 9999 !important;
-          }
-        }
-      `}</style>
+        `}</style>
+      )}
     </div>
   );
 }
